@@ -33,7 +33,7 @@ class MyFrame
 	private JTextArea resadd; 
 	private String sXMLPath, sExistingXpath;
 
-	private String dates[] 
+	private String categoryList[] 
 		= { "WebEdit", "WebList", "DataBase", "Browser", 
 			"WebElement", "WebTable", "Auxillary", "Custom"}; 
 
@@ -101,7 +101,7 @@ class MyFrame
 		category.setLocation(100, 200);
 		c.add(category);
 
-		StepType = new JComboBox(dates);
+		StepType = new JComboBox(categoryList);
 		StepType.setFont(new Font("Arial", Font.PLAIN, 15)); 
 		StepType.setSize(90, 20);
 		StepType.setLocation(200, 200); 
@@ -117,6 +117,7 @@ class MyFrame
 		tadd.setFont(new Font("Arial", Font.PLAIN, 13)); 
 		tadd.setSize(270, 200); 
 		tadd.setLineWrap(true);
+		tadd.setAutoscrolls(true);
 		tadd.setLocation(200, 250); 
 		c.add(tadd);
 
@@ -231,7 +232,7 @@ class MyFrame
 		category.setLocation(100, 200);
 		c.add(category);
 
-		StepType = new JComboBox(dates);
+		StepType = new JComboBox(categoryList);
 		StepType.setFont(new Font("Arial", Font.PLAIN, 15)); 
 		StepType.setSize(90, 20);
 		StepType.setLocation(200, 200); 
@@ -248,6 +249,7 @@ class MyFrame
 		tadd.setFont(new Font("Arial", Font.PLAIN, 13)); 
 		tadd.setSize(270, 200); 
 		tadd.setLineWrap(true);
+		tadd.setAutoscrolls(true);
 		tadd.setLocation(200, 250); 
 		tadd.setText(Instructions);
 		c.add(tadd);
