@@ -169,7 +169,7 @@ class MyFrame
 		
 		setTitle("Step Definition"); 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		getContentPane().setBackground(new Color(230, 230, 230));
+		getContentPane().setBackground(new Color(230, 255, 230));
 		setBounds(300, 90, 900, 600); 
 		setResizable(false); 
 

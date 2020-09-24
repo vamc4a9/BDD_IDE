@@ -114,6 +114,7 @@ public class Driver extends JPanel
         btnSaveAll.addActionListener(this);
         
         RefreshProject = new JButton("Refresh");
+        RefreshProject.setEnabled(false);
 //        RefreshProject.setEnabled(false);
         PrjectOpen.add(btnOpen);
         PrjectOpen.add(btnSave);
@@ -124,6 +125,7 @@ public class Driver extends JPanel
         ProjectExplorerPane.setTopComponent(PrjectOpen);
         ProjectExplorerPane.setDividerLocation(0.5);
         ProjectExplorerPane.setBottomComponent(treeView);
+        ProjectExplorerPane.setBackground(new Color(230, 255, 230));
         
         //Creating the step definition explorer pane
         JPanel StepDefOpen = new JPanel();
@@ -153,10 +155,12 @@ public class Driver extends JPanel
         
         //Creating the step definition explorer pane
         JSplitPane ExplorerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        setDividerLocation(ExplorerPane, 0.5);
         ExplorerPane.setTopComponent(ProjectExplorerPane);
         ExplorerPane.setBottomComponent(StepDefExplorerPane);
         
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        setDividerLocation(splitPane, 0.32);
         splitPane.setTopComponent(ExplorerPane);
         splitPane.setBottomComponent(jEditor);
  
@@ -251,32 +255,50 @@ public class Driver extends JPanel
         
     }
     
+    static void setDividerLocation(
+    	    final JSplitPane splitPane, final double location)
+    	{
+    	    SwingUtilities.invokeLater(new Runnable()
+    	    {
+    	        @Override
+    	        public void run()
+    	        {
+    	            splitPane.setDividerLocation(location);
+    	            splitPane.validate();
+    	        }
+    	    });
+    	}
+    
     public void valueChanged(TreeSelectionEvent e) {
     	if (e.getSource() == stepDef) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
             		((JTree) e.getSource()).getLastSelectedPathComponent();
-            if (node.getChildCount() == 0) {
-            	EditStepDef.setEnabled(true);
-            } else {
+            try {
+	            if (node.getChildCount() == 0) {
+	            	EditStepDef.setEnabled(true);
+	            } else {
+	            	EditStepDef.setEnabled(false);
+	            }
+            } catch (Exception e3) {
             	EditStepDef.setEnabled(false);
+            	System.out.println(e3.getMessage());
             }
+	            
     	}
     }
     
     public int findTabByName(String title)  
     {
-      int tabCount = editor.getTabCount();
-      for (int i=0; i < tabCount; i++) 
-      {
-        String tabTitle = editor.getTitleAt(i);
-        if (tabTitle.equals(title)) return i;
-      }
-      return -1;
-    }
+		int tabCount = editor.getTabCount();
+		for (int i=0; i < tabCount; i++) {
+			String tabTitle = editor.getTitleAt(i);
+			if (tabTitle.equals(title)) return i;
+		}
+		return -1;
+	}
  
     private DefaultMutableTreeNode ReadFeature(String sFile) {
         DefaultMutableTreeNode top = null;
-        boolean bFlag = false;
         try {
 	    	File file=new File(sFile);
 	    	FileReader fr=new FileReader(file);
@@ -286,7 +308,6 @@ public class Driver extends JPanel
 	    	{  
 	    		if (line.startsWith("Feature:")) {
 	    			top = new DefaultMutableTreeNode(line);
-	    			bFlag = true;
 	    			break;
 	    		}
 	    	}   
@@ -422,6 +443,7 @@ public class Driver extends JPanel
 	                project.addMouseListener(this);
 	                ProjectExplorerPane.setBottomComponent(treeView);
 	                sCurrentProject = file.getAbsolutePath();
+	                RefreshProject.setEnabled(true);
 	            }
         	}
         } else if (e.getSource() == btnMeta) {
