@@ -187,9 +187,26 @@ public class Driver extends JPanel
                         public void actionPerformed(ActionEvent e) {
                         	boolean sFlag = true;
                         	if (editor.getTitleAt(editor.getSelectedIndex()).startsWith("*")) {
-						        JFrame frm=new JFrame();   
-						        int j = JOptionPane.showConfirmDialog(frm, "If you click on Yes, you will lose the changes made to the file. you can save the changes by right clicking on the tab or by clicking on Save button from Prject explorer!");
-						        if (j != 0) {
+                        		
+                        		Object[] options1 = {"Save",
+                                        "Don't Save", 
+                                        "Cancel"};
+
+                        		int j = JOptionPane.showOptionDialog(null,
+                                        "Save '"+editor.getTitleAt(editor.getSelectedIndex()).replace("*", "") + ".feature"+"'?",
+                                        "Save Resource!",
+                                        JOptionPane.YES_NO_CANCEL_OPTION,
+                                        JOptionPane.PLAIN_MESSAGE,
+                                        null,
+                                        options1,
+                                        null);
+                       
+						        if (j == 0) {
+						        	sFlag = true;
+						        	fn_SaveCurrentTab();
+						        } else if (j == 1) {
+						        	sFlag = true;
+						        } else {
 						        	sFlag = false;
 						        }
                         	}
@@ -231,18 +248,7 @@ public class Driver extends JPanel
                     JMenuItem save = new JMenuItem(new AbstractAction("Save") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                        	
-        		            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
-        		            String sFile = sTabsList.get(editor.getSelectedIndex() + 1);
-        		            try {
-        		                FileWriter myWriter = new FileWriter(sFile);
-        		                myWriter.write(oEditor.getText());
-        		                myWriter.close();
-        		              } catch (Exception e2) {
-        		                e2.printStackTrace();
-        		              }        		            
-        		            sOriginalText.put(editor.getSelectedIndex(), oEditor.getText());
-        		            editor.setTitleAt(editor.getSelectedIndex(), editor.getTitleAt(editor.getSelectedIndex()).replace("*", ""));
+                        	fn_SaveCurrentTab();
                         }
                     });
                     
@@ -285,6 +291,20 @@ public class Driver extends JPanel
             }
 	            
     	}
+    }
+    
+    public void fn_SaveCurrentTab() {
+        JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
+        String sFile = sTabsList.get(editor.getSelectedIndex() + 1);
+        try {
+            FileWriter myWriter = new FileWriter(sFile);
+            myWriter.write(oEditor.getText());
+            myWriter.close();
+          } catch (Exception e2) {
+            e2.printStackTrace();
+          }        		            
+        sOriginalText.put(editor.getSelectedIndex(), oEditor.getText());
+        editor.setTitleAt(editor.getSelectedIndex(), editor.getTitleAt(editor.getSelectedIndex()).replace("*", ""));    	
     }
     
     public int findTabByName(String title)  
