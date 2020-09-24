@@ -28,6 +28,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -85,6 +86,8 @@ public class Driver extends JPanel
         JScrollPane stepDefTree = new JScrollPane();
         
         project = new JTree(top);
+        JLabel sOpenMessage = new JLabel("       Click on Open to browse and select the project");
+        JLabel sXMLMessage = new JLabel("Click on Load to browse and select the MetaData.xml");
         project.setName("ProjectExplorer");
         stepDef = new JTree(top);
         stepDef.setName("StepDefinition");
@@ -115,7 +118,6 @@ public class Driver extends JPanel
         
         RefreshProject = new JButton("Refresh");
         RefreshProject.setEnabled(false);
-//        RefreshProject.setEnabled(false);
         PrjectOpen.add(btnOpen);
         PrjectOpen.add(btnSave);
         PrjectOpen.add(btnSaveAll);
@@ -124,7 +126,7 @@ public class Driver extends JPanel
         ProjectExplorerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         ProjectExplorerPane.setTopComponent(PrjectOpen);
         ProjectExplorerPane.setDividerLocation(0.5);
-        ProjectExplorerPane.setBottomComponent(treeView);
+        ProjectExplorerPane.setBottomComponent(sOpenMessage);
         ProjectExplorerPane.setBackground(new Color(230, 255, 230));
         
         //Creating the step definition explorer pane
@@ -149,11 +151,11 @@ public class Driver extends JPanel
 		StepDefOpen.add(EditStepDef);
 		StepDefOpen.add(Refresh);
         StepDefExplorerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        StepDefExplorerPane.setBackground(new Color(230, 255, 230));
         
         StepDefExplorerPane.setTopComponent(StepDefOpen);
-        StepDefExplorerPane.setBottomComponent(stepDefTree);
+        StepDefExplorerPane.setBottomComponent(sXMLMessage);
         
-        //Creating the step definition explorer pane
         JSplitPane ExplorerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
         setDividerLocation(ExplorerPane, 0.5);
         ExplorerPane.setTopComponent(ProjectExplorerPane);
@@ -224,12 +226,12 @@ public class Driver extends JPanel
             		            for(int key = 1; key<=iTotalKeys; key++) {
     								if (key == iSelectedIndex + 1) {
     									sTabsList.remove(key);
-    									sSelectedPath.remove(key);
     									sOriginalText.remove(key);
+    									sSelectedPath.remove(key);
     									bFlag = true;
     								} else if (bFlag) {
     									sTabsList.put(key-1, sTabsList.get(key));
-    									sOriginalText.put(key-1, sTabsList.get(key));
+    									sOriginalText.put(key-1, sOriginalText.get(key));
     									sSelectedPath.put(key-1, sSelectedPath.get(key));
     								}
             		            }
@@ -239,7 +241,6 @@ public class Driver extends JPanel
             		            	sOriginalText.remove(iTotalKeys);
             		            	sSelectedPath.remove(iTotalKeys);
             		            }
-            		            
             		            tabIndex--;                        		
                         	}
                         }
@@ -331,6 +332,8 @@ public class Driver extends JPanel
 	    			break;
 	    		}
 	    	}   
+	    	fr.close();
+	    	br.close();
         } catch (Exception e) {
         	e.printStackTrace();
         }
@@ -355,15 +358,15 @@ public class Driver extends JPanel
 	    			top1.add(new DefaultMutableTreeNode(line));
 	    		}
 	    	}  
-	    	fr.close();
 	    	editor.addTab(sFile.split("\\\\")[sFile.split("\\\\").length-1].replace(".feature", ""), sNewTab);
 	    	sOpenedTabs.add(sFile.split("\\\\")[sFile.split("\\\\").length-1]);
 	    	sOriginalText.put(tabIndex, sNewTab.getText());
 	    	sTabsList.put(tabIndex, sFile);
-//	    	bSaveFlags.put(tabIndex, true);
 	    	sSelectedPath.put(tabIndex, project.getSelectionPaths());
 	    	editor.setFocusable(true);
 	    	editor.setSelectedIndex(tabIndex-1);
+	    	fr.close();
+	    	br.close();
 	    	tabIndex++;
 	    	return top1;
     	} catch(IOException e)  {
@@ -416,7 +419,7 @@ public class Driver extends JPanel
     	
         if (useSystemLookAndFeel) {
             try {
-//            	UIManager.setLookAndFeel(new MetalLookAndFeel());
+            	UIManager.setLookAndFeel(new MetalLookAndFeel());
                 UIManager.setLookAndFeel(
                     UIManager.getSystemLookAndFeelClassName());
             } catch (Exception e) {
@@ -609,7 +612,7 @@ public class Driver extends JPanel
 	            }
 			}
 		} else if (tree.getName()=="ProjectExplorer") {
-			if (e.getButton() == 3) {
+			if (SwingUtilities.isRightMouseButton(e)) {
 			    int x = e.getX();
 			    int y = e.getY();
 			    TreePath path = tree.getPathForLocation(x, y);
@@ -674,7 +677,7 @@ public class Driver extends JPanel
 						             }
 						        }
 						        
-						        RemoveNode(tree, rightClickedNode);					    		
+						        RemoveNode(tree, rightClickedNode);
 					    	}
 					    }
 					});
@@ -710,16 +713,7 @@ public class Driver extends JPanel
 					    }
 					});
 					
-//					Refresh.addActionListener(new ActionListener() {
-//					    public void actionPerformed(ActionEvent ev) {
-//					    	tree.scrollPathToVisible(new TreePath(rightClickedNode.getPath()));
-//				            DefaultTreeModel model = (DefaultTreeModel) project.getModel();
-//				            model.reload(rightClickedNode);					        
-//					    }
-//					});
-					
 					popup.add(newFeatureFile);
-//					popup.add(Refresh);
 					popup.show(tree, x, y);
 			    } else {
 
