@@ -444,6 +444,8 @@ public class Driver extends JPanel
         	stepDef = build(sCurrentMetaFile);
         	stepDef.setName("StepDefinition");
         	JScrollPane treeView = new JScrollPane(stepDef);
+        	stepDef.addTreeSelectionListener(this);
+        	stepDef.addMouseListener(this);        	
         	StepDefExplorerPane.setBottomComponent(treeView);
         } else if (e.getSource() == RefreshProject){
             DefaultMutableTreeNode top = addNodes(null, new File(sCurrentProject), true);
@@ -557,9 +559,11 @@ public class Driver extends JPanel
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		tree.getLastSelectedPathComponent();
 	            if (node.getChildCount() == 0) {
-		            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
-		            oEditor.insert(node.toString(), oEditor.getCaretPosition());
-		            oEditor.insert(newline, oEditor.getCaretPosition());
+	            	if (editor.getSelectedIndex() >= 0) {
+			            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
+			            oEditor.insert(node.toString(), oEditor.getCaretPosition());
+			            oEditor.insert(newline, oEditor.getCaretPosition());
+	            	}
 	            }
 			}
 		} else if (tree.getName()=="ProjectExplorer") {
