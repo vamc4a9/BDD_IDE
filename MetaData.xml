@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Meta>
+	<WebEdit>
+		<StepDefinition ExternalData="Yes" Instructions="sample stuff" Statement="sample stuff"/>
+	<StepDefinition ExternalData="Yes" Instructions="login_admin comes from catalog sheet" Statement="user performs [login_admin]"/></WebEdit>
+	<WebList>
+		<StepDefinition ExternalData="Yes" Instructions="" Statement="Select xyz from abc control"/>
+	</WebList>
+	<DataBase>
+		
+	<StepDefinition ExternalData="Yes" Instructions="abc is the query that can be hardcoded or can be passed from xyz workbook" Statement="Run abc query from xyz database"/></DataBase>
+	<Browser>
+		<StepDefinition ExternalData="No" Instructions="" Statement="Close the browser"/>
+	</Browser>
+	<WebElement>
+		<StepDefinition ExternalData="No" Instructions="" Statement="Wait until abc control is visible"/>
+	</WebElement>
+	<WebLink>
+		<StepDefinition ExternalData="No" Instructions="" Statement="click on abc control"/>
+	</WebLink>
+	<WebTable>
+		<StepDefinition ExternalData="No" Instructions="" Statement="verify that abc column in xyz table is sorted"/>
+	</WebTable>
+	<Auxillary>
+		<StepDefinition ExternalData="No" Instructions="" Statement="Wait for 5 seconds"/>
+	</Auxillary>
+	<Custom>
+		<StepDefinition ExternalData="No" Instructions="" Statement="Perform xyz in abc application"/>
+	</Custom>	
+</Meta>
