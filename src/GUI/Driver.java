@@ -77,7 +77,15 @@ public class Driver extends JPanel
     private static boolean useSystemLookAndFeel = false;
     public static JFrame fParent;
  
-    public Driver(String sData) {
+    public static void main(String[] args) {
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI();
+            }
+        });
+    }
+    
+    public Driver() {
         super(new GridLayout(1,0));
         fParent.addWindowListener(new WListener());
         DefaultMutableTreeNode top = null;
@@ -205,7 +213,7 @@ public class Driver extends JPanel
                        
 						        if (j == 0) {
 						        	sFlag = true;
-						        	fn_SaveCurrentTab();
+						        	fn_SaveCurrentTab(editor.getSelectedIndex());
 						        } else if (j == 1) {
 						        	sFlag = true;
 						        } else {
@@ -249,7 +257,7 @@ public class Driver extends JPanel
                     JMenuItem save = new JMenuItem(new AbstractAction("Save") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                        	fn_SaveCurrentTab();
+                        	fn_SaveCurrentTab(editor.getSelectedIndex());
                         }
                     });
                     
@@ -262,6 +270,9 @@ public class Driver extends JPanel
         
     }
     
+	/**
+	 * This method is used to set the divider location between two components in the JSplitPane
+	 **/
     static void setDividerLocation(
     	    final JSplitPane splitPane, final double location)
     	{
@@ -276,6 +287,9 @@ public class Driver extends JPanel
     	    });
     	}
     
+	/**
+	 * This method is used to identify and enable View/Edit button based on whether the user has selected any step definition
+	 **/
     public void valueChanged(TreeSelectionEvent e) {
     	if (e.getSource() == stepDef) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
@@ -294,9 +308,12 @@ public class Driver extends JPanel
     	}
     }
     
-    public void fn_SaveCurrentTab() {
+	/**
+	 * This method is used to save the given tab index content in the corresponding file
+	 **/        
+    public void fn_SaveCurrentTab(int CurrentTabIndex) {
         JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
-        String sFile = sTabsList.get(editor.getSelectedIndex() + 1);
+        String sFile = sTabsList.get(CurrentTabIndex + 1);
         try {
             FileWriter myWriter = new FileWriter(sFile);
             myWriter.write(oEditor.getText());
@@ -305,9 +322,12 @@ public class Driver extends JPanel
             e2.printStackTrace();
           }        		            
         sOriginalText.put(editor.getSelectedIndex(), oEditor.getText());
-        editor.setTitleAt(editor.getSelectedIndex(), editor.getTitleAt(editor.getSelectedIndex()).replace("*", ""));    	
+        editor.setTitleAt(editor.getSelectedIndex(), editor.getTitleAt(CurrentTabIndex).replace("*", ""));    	
     }
     
+	/**
+	 * This method is used find the editor tab index using its title
+	 **/    
     public int findTabByName(String title)  
     {
 		int tabCount = editor.getTabCount();
@@ -318,6 +338,9 @@ public class Driver extends JPanel
 		return -1;
 	}
  
+	/**
+	 * This method is used to read and update feature details from the feature file 
+	 **/  	
     private DefaultMutableTreeNode ReadFeature(String sFile) {
         DefaultMutableTreeNode top = null;
         try {
@@ -341,9 +364,13 @@ public class Driver extends JPanel
         return top;
     }
     
+	/**
+	 * This method is used to read and update scenario content the the feature file content editor 
+	 **/  	
     private DefaultMutableTreeNode ReadScenarios(String sFile, DefaultMutableTreeNode top1) {
     	try  {
 	    	File file=new File(sFile);
+	    	String sAbsolutePath = file.getAbsolutePath();
 	    	FileReader fr=new FileReader(file);
 	    	BufferedReader br=new BufferedReader(fr);
 	    	JTextArea sNewTab = new JTextArea();
@@ -358,10 +385,10 @@ public class Driver extends JPanel
 	    			top1.add(new DefaultMutableTreeNode(line));
 	    		}
 	    	}  
-	    	editor.addTab(sFile.split("\\\\")[sFile.split("\\\\").length-1].replace(".feature", ""), sNewTab);
-	    	sOpenedTabs.add(sFile.split("\\\\")[sFile.split("\\\\").length-1]);
+	    	editor.addTab(sAbsolutePath.split("\\\\")[sAbsolutePath.split("\\\\").length-1].replace(".feature", ""), sNewTab);
+	    	sOpenedTabs.add(sAbsolutePath.split("\\\\")[sAbsolutePath.split("\\\\").length-1]);
 	    	sOriginalText.put(tabIndex, sNewTab.getText());
-	    	sTabsList.put(tabIndex, sFile);
+	    	sTabsList.put(tabIndex, sAbsolutePath);
 	    	sSelectedPath.put(tabIndex, project.getSelectionPaths());
 	    	editor.setFocusable(true);
 	    	editor.setSelectedIndex(tabIndex-1);
@@ -375,43 +402,53 @@ public class Driver extends JPanel
     	}  
     }
     
-    /** Add nodes from under "dir" into curTop. Highly recursive. */
+	/**
+	 * This method is used to form the jTree for system folders
+	 **/  	
     public DefaultMutableTreeNode addNodes(DefaultMutableTreeNode curTop, File dir, boolean parent) {
-      String curPath = dir.getPath();
-      DefaultMutableTreeNode curDir = null;
-      if (parent) {
-    	  curDir = new DefaultMutableTreeNode(dir.getPath());
-      } else {
-    	  curDir = new DefaultMutableTreeNode(dir.getPath().split("\\\\")[dir.getPath().split("\\\\").length-1]);
-      }
-      if (curTop != null) { // should only be null at root
-        curTop.add(curDir);
-      }
-      Vector ol = new Vector();
-      String[] tmp = dir.list();
-      for (int i = 0; i < tmp.length; i++)
-        ol.addElement(tmp[i]);
-      Collections.sort(ol, String.CASE_INSENSITIVE_ORDER);
-      File f;
-      Vector files = new Vector();
-      // Make two passes, one for Dirs and one for Files. This is #1.
-      for (int i = 0; i < ol.size(); i++) {
-        String thisObject = (String) ol.elementAt(i);
-        String newPath;
-        if (curPath.equals("."))
-          newPath = thisObject;
-        else
-          newPath = curPath + File.separator + thisObject;
-        if ((f = new File(newPath)).isDirectory())
-          addNodes(curDir, f, false);
-        else
-          files.addElement(thisObject);
-      }
-      // Pass two: for files.
-      for (int fnum = 0; fnum < files.size(); fnum++)
-        curDir.add(new DefaultMutableTreeNode(files.elementAt(fnum)));
-      return curDir;
-    }
+    	
+		String curPath = dir.getPath();
+		DefaultMutableTreeNode curDir = null;
+		
+		if (parent) {
+			curDir = new DefaultMutableTreeNode(dir.getPath());
+		} else {
+			curDir = new DefaultMutableTreeNode(dir.getPath().split("\\\\")[dir.getPath().split("\\\\").length-1]);
+		}
+		
+		if (curTop != null) { // should only be null at root
+			curTop.add(curDir);
+		}
+		
+		Vector ol = new Vector();
+		String[] tmp = dir.list();
+		
+		for (int i = 0; i < tmp.length; i++)
+			ol.addElement(tmp[i]);
+		
+		Collections.sort(ol, String.CASE_INSENSITIVE_ORDER);
+		File f;
+		Vector files = new Vector();
+		
+		// Make two passes, one for Dirs and one for Files. This is #1.
+		for (int i = 0; i < ol.size(); i++) {
+			String thisObject = (String) ol.elementAt(i);
+			String newPath;
+			if (curPath.equals("."))
+				newPath = thisObject;
+			else
+				newPath = curPath + File.separator + thisObject;
+			if ((f = new File(newPath)).isDirectory())
+				addNodes(curDir, f, false);
+			else
+				files.addElement(thisObject);
+		}
+		
+		// Pass two: for files.
+		for (int fnum = 0; fnum < files.size(); fnum++)
+			curDir.add(new DefaultMutableTreeNode(files.elementAt(fnum)));
+		return curDir;
+	}
 
     private static void createAndShowGUI() {
     	
@@ -433,7 +470,7 @@ public class Driver extends JPanel
         fParent.setUndecorated(true);
         fParent.getRootPane().setWindowDecorationStyle(JRootPane.FRAME);  
         fParent.getContentPane().setBackground(new Color(230, 255, 230));
-        fParent.add(new Driver(""));
+        fParent.add(new Driver());
         fParent.setSize(1000, 600);
         fParent.setLocation(300, 50); 
         fParent.setVisible(true);
@@ -450,7 +487,6 @@ public class Driver extends JPanel
         		sSelectedPath.clear();
         		sOpenedTabs.clear();
         		sOriginalText.clear();
-        		
 	        	tabIndex = 1;
 	        	JFileChooser fc=new JFileChooser();    
 	        	fc.setDialogTitle("LoadProject");
@@ -458,15 +494,8 @@ public class Driver extends JPanel
 	            int returnVal=fc.showOpenDialog(this);
 	            if (returnVal == JFileChooser.APPROVE_OPTION) {
 	                File file = fc.getSelectedFile();
-	                DefaultMutableTreeNode top = addNodes(null, file, true);
-	                project = new JTree(top);
-	                project.setName("ProjectExplorer");
-	                JScrollPane treeView = new JScrollPane(project);
-	                project.addTreeSelectionListener(this);
-	                project.addMouseListener(this);
-	                ProjectExplorerPane.setBottomComponent(treeView);
 	                sCurrentProject = file.getAbsolutePath();
-	                RefreshProject.setEnabled(true);
+	                LoadProjectFolder(sCurrentProject);
 	            }
         	}
         } else if (e.getSource() == btnMeta) {
@@ -475,78 +504,94 @@ public class Driver extends JPanel
             int returnVal=fc.showOpenDialog(this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fc.getSelectedFile();
-            	stepDef = build(file.getAbsolutePath());
-            	stepDef.setName("StepDefinition");
-            	JScrollPane treeView = new JScrollPane(stepDef);
-            	stepDef.addTreeSelectionListener(this);
-            	stepDef.addMouseListener(this);
-            	StepDefExplorerPane.setBottomComponent(treeView);
                 sCurrentMetaFile = file.getAbsolutePath();
-                addNewStepDef.setEnabled(true);
-                Refresh.setEnabled(true);
+                LoadMetaFile(sCurrentMetaFile);
             }
         } else if (e.getSource() == Refresh) {
-        	stepDef = build(sCurrentMetaFile);
-        	stepDef.setName("StepDefinition");
-        	JScrollPane treeView = new JScrollPane(stepDef);
-        	stepDef.addTreeSelectionListener(this);
-        	stepDef.addMouseListener(this);        	
-        	StepDefExplorerPane.setBottomComponent(treeView);
+        	LoadMetaFile(sCurrentMetaFile);
         } else if (e.getSource() == RefreshProject){
-            DefaultMutableTreeNode top = addNodes(null, new File(sCurrentProject), true);
-            project = new JTree(top);
-            project.setName("ProjectExplorer");
-            JScrollPane treeView = new JScrollPane(project);
-            project.addTreeSelectionListener(this);
-            project.addMouseListener(this);
-            ProjectExplorerPane.setBottomComponent(treeView);
+        	LoadProjectFolder(sCurrentProject);
         } else if (e.getSource() == addNewStepDef) {
         	MyFrame f = new MyFrame(sCurrentMetaFile); 
         } else if (e.getSource() == btnSave) {
-            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
-            String sFile = sTabsList.get(editor.getSelectedIndex() + 1);
-			try {
-				FileWriter myWriter = new FileWriter(sFile);
-				myWriter.write(oEditor.getText());
-				myWriter.close();
-			} catch (Exception e2) {
-				e2.printStackTrace();
-			}
-            sOriginalText.put(editor.getSelectedIndex(), oEditor.getText());
-            editor.setTitleAt(editor.getSelectedIndex(), editor.getTitleAt(editor.getSelectedIndex()).replace("*", ""));
+        	fn_SaveCurrentTab(editor.getSelectedIndex());
         } else if (e.getSource() == btnSaveAll) {
             int tabCount = editor.getTabCount();
-            for (int i=0; i < tabCount; i++) 
+            for (int CurrentTabIndex=0; CurrentTabIndex < tabCount; CurrentTabIndex++) 
             {
-            	JTextArea oEditor = (JTextArea) editor.getComponent(i);
-                String sFile = sTabsList.get(i + 1);
-    			try {
-    				FileWriter myWriter = new FileWriter(sFile);
-    				myWriter.write(oEditor.getText());
-    				myWriter.close();
-    			} catch (Exception e2) {
-    				e2.printStackTrace();
-    			}
-                sOriginalText.put(i+1, oEditor.getText());
-                editor.setTitleAt(i, editor.getTitleAt(i).replace("*", ""));
+            	fn_SaveCurrentTab(CurrentTabIndex);
             }
         } else if (e.getSource() == EditStepDef) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode)
             		stepDef.getLastSelectedPathComponent();
-            
-            String sFullPath = "";
-            if (node == null) return;
-            for (int i = 0; i<node.getPath().length-1;i++) {
-            	if (i == 0)
-            		sFullPath = node.getPath()[i].toString();
-            	else
-            		sFullPath = sFullPath + "/" + node.getPath()[i];
-            }
-            
+            String sFullPath = GetParentNodePath(node);
             MyFrame f = new MyFrame(sCurrentMetaFile, node.toString(), "/"+sFullPath);
         }
 	}
 	
+	/**
+	 * This method is used to load any selected xml file in the Step Definition explorer
+	 **/  	
+	public void LoadMetaFile(String sFilePath) {
+    	stepDef = build(sFilePath);
+    	stepDef.setName("StepDefinition");
+    	JScrollPane treeView = new JScrollPane(stepDef);
+    	stepDef.addTreeSelectionListener(this);
+    	stepDef.addMouseListener(this);        	
+    	StepDefExplorerPane.setBottomComponent(treeView);
+        addNewStepDef.setEnabled(true);
+        Refresh.setEnabled(true);    	
+	}
+	
+	/**
+	 * This method is used to load any selected folder in the project explorer
+	 **/  
+	public void LoadProjectFolder(String sFolder) {
+		File file = new File(sFolder);
+        DefaultMutableTreeNode top = addNodes(null, file, true);
+        project = new JTree(top);
+        project.setName("ProjectExplorer");
+        JScrollPane treeView = new JScrollPane(project);
+        project.addTreeSelectionListener(this);
+        project.addMouseListener(this);
+        ProjectExplorerPane.setBottomComponent(treeView);
+        sCurrentProject = file.getAbsolutePath();
+        RefreshProject.setEnabled(true);	
+	}
+	
+	/**
+	 * This method returns the selected node's parent path from the root element
+	 **/
+	public String GetNodePath(DefaultMutableTreeNode node) {
+        String sFullPath = "";
+        if (node == null) return "";
+        for (int i = 0; i<node.getPath().length;i++) {
+        	if (i == 0)
+        		sFullPath = node.getPath()[i].toString();
+        	else
+        		sFullPath = sFullPath + "/" + node.getPath()[i];
+        }
+		return sFullPath;
+	}
+	
+	/**
+	 * This method returns the selected node's path from the root element
+	 **/	
+	public String GetParentNodePath(DefaultMutableTreeNode node) {
+        String sFullPath = "";
+        if (node == null) return "";
+        for (int i = 0; i<node.getPath().length-1;i++) {
+        	if (i == 0)
+        		sFullPath = node.getPath()[i].toString();
+        	else
+        		sFullPath = sFullPath + "/" + node.getPath()[i];
+        }
+		return sFullPath;
+	}
+	
+	/**
+	 * This method is used to build the JTree structure for xml files
+	 **/
 	public JTree build(String pathToXml) {
 		SAXReader reader = new SAXReader();
 		Document doc;
@@ -559,6 +604,10 @@ public class Driver extends JPanel
 		}
 	}
 
+	/**
+	 * This method is used to build the JTree structure for xml files
+	 * This is called from build method
+	 **/
 	public DefaultMutableTreeNode build(Element e, boolean bStep) {
 		DefaultMutableTreeNode result = null;
 		if (bStep)
@@ -576,6 +625,9 @@ public class Driver extends JPanel
 	   return result;         
 	}
 	
+	/**
+	 * This method is used to display any popup messages during the workflow
+	 **/
 	public void msgbox(String title) {
 		
         JFrame oFrame = new JFrame("Message!");
@@ -588,14 +640,9 @@ public class Driver extends JPanel
         
 	}	
 	
-    public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
-    }
-
+	/**
+	 * This method handles the mouse click operations on both ProjectExplorer and StepDefinitin Explorer trees
+	 **/	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		JTree tree = (JTree) e.getSource();
@@ -636,16 +683,7 @@ public class Driver extends JPanel
 			      tree.setSelectionPath(path);
 			    }
 			    
-		        String sFullPath = "";
-		        
-		        if (rightClickedNode == null) return;
-		        for (int i = 0; i<rightClickedNode.getPath().length;i++) {
-		        	if (i == 0) {
-		        		sFullPath = rightClickedNode.getPath()[i].toString();
-		        	} else {
-		        		sFullPath = sFullPath + "\\" + rightClickedNode.getPath()[i];
-		        	}
-		        }
+			    String sFullPath = GetNodePath(rightClickedNode);
 		        
 			    if (rightClickedNode.toString().endsWith(".feature")) {
 					JPopupMenu popup = new JPopupMenu();
@@ -660,24 +698,17 @@ public class Driver extends JPanel
 						        JFrame frm=new JFrame();   
 						        int j = JOptionPane.showConfirmDialog(frm, "Are you sure?");
 
-						        String sFullPath = "";
-						        for (int i = 0; i<rightClickedNode.getPath().length;i++) {
-						        	if (i == 0) {
-						        		sFullPath = rightClickedNode.getPath()[i].toString();
-						        	} else {
-						        		sFullPath = sFullPath + "\\" + rightClickedNode.getPath()[i];
-						        	}
-						        }			        
+						        String sFullPath = GetNodePath(rightClickedNode);
 						        if (j==0) {
 						            try {
 						                File file = new File(sFullPath);
 						                FileUtils.forceDelete(file);
+						                RemoveNode(tree, rightClickedNode);
 						             } catch(Exception e) {
 						                e.printStackTrace();
+						                msgbox("Unable to delete " + sFullPath);
 						             }
 						        }
-						        
-						        RemoveNode(tree, rightClickedNode);
 					    	}
 					    }
 					});
@@ -693,14 +724,8 @@ public class Driver extends JPanel
 					    public void actionPerformed(ActionEvent ev) {
 					        JFrame frm=new JFrame();   
 					        String name=JOptionPane.showInputDialog(frm,"Enter new feature file name \n example: test.feature");
-					        String sFullPath = "";
-					        for (int i = 0; i<rightClickedNode.getPath().length;i++) {
-					        	if (i == 0) {
-					        		sFullPath = rightClickedNode.getPath()[i].toString();
-					        	} else {
-					        		sFullPath = sFullPath + "\\" + rightClickedNode.getPath()[i];
-					        	}
-					        }			        
+					        
+					        String sFullPath = GetNodePath(rightClickedNode);
 					        if (!name.contentEquals("")) {
 					            try {
 					                File file = new File(sFullPath + "\\" + name);
@@ -722,15 +747,8 @@ public class Driver extends JPanel
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		tree.getLastSelectedPathComponent();
 	            
-	            String sFullPath = "";
-	            if (node == null) return;
-	            for (int i = 0; i<node.getPath().length;i++) {
-	            	if (i == 0) {
-	            		sFullPath = node.getPath()[i].toString();
-	            	} else {
-	            		sFullPath = sFullPath + "\\" + node.getPath()[i];
-	            	}
-	            }
+	            String sFullPath = GetNodePath(node);
+
 	            DefaultMutableTreeNode top = null;
 	            
 	            if (node.toString().toLowerCase().endsWith(".feature")) {
@@ -755,6 +773,9 @@ public class Driver extends JPanel
 		}
 	}
 	
+	/**
+	 * This method can remove any given node from the given JTree
+	 **/	
 	public void RemoveNode(JTree tree, DefaultMutableTreeNode node) {
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         if (node.getParent() != null) {
@@ -762,6 +783,9 @@ public class Driver extends JPanel
         }
 	}
 	
+	/**
+	 * This method can remove any given node from the given JTree
+	 **/
     public void removeCurrentNode(JTree tree, TreePath[] paths) {
     	
     	DefaultMutableTreeNode aNode = (DefaultMutableTreeNode) (paths[0].getLastPathComponent());
@@ -772,6 +796,9 @@ public class Driver extends JPanel
         
     }	
     
+	/**
+	 * This method can add any node to given parent node in Jtree
+	 **/    
 	public void updateTree(final String nodeToAdd, JTree tree, DefaultMutableTreeNode parent) {
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 		DefaultMutableTreeNode child = new DefaultMutableTreeNode(nodeToAdd);
@@ -797,6 +824,9 @@ public class Driver extends JPanel
 		
 	}
 
+	/**
+	 * This method is used to identify if there are any unsaved changes in the feature file
+	 **/  
 	@Override
 	public void focusGained(FocusEvent e) {
         JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
@@ -807,6 +837,9 @@ public class Driver extends JPanel
         }
 	}
 
+	/**
+	 * This method is used to identify if there are any unsaved changes in the feature file
+	 **/  
 	@Override
 	public void focusLost(FocusEvent arg0) {
         JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
@@ -818,6 +851,9 @@ public class Driver extends JPanel
 	}
 }
 
+/**
+ * This method is for window closing action the main window
+ **/    
 class WListener extends WindowAdapter {
 	public void windowClosing(WindowEvent e) {
         String ObjButtons[] = {"Yes","No"};
@@ -828,37 +864,3 @@ class WListener extends WindowAdapter {
         }
 	}
 }
-
-class MyDefaultMetalTheme extends DefaultMetalTheme {
-	  public ColorUIResource getWindowTitleInactiveBackground() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getWindowTitleBackground() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getPrimaryControlHighlight() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getPrimaryControlDarkShadow() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getPrimaryControl() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getControlHighlight() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getControlDarkShadow() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-
-	  public ColorUIResource getControl() {
-	    return new ColorUIResource(java.awt.Color.orange);
-	  }
-	}
