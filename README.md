@@ -9,4 +9,4 @@ Below are some of the features of this tool:
   - search for any existing step definition with simple find functionality(WorkInProgress)
   - Search for scenarios with keywords and export it to notepad(WorkInProgress)
 
-Since this is a maven project, user can just download and import this project to start working, and for now, user can only use the MetaData.xml file to add/update the step definitions, in future versions, we will add support to create new meta files through tool.
+Since this is a maven project, user can just download and import this into eclipse/netbeans to start working, and for now, user can only use the MetaData.xml file to add/update the step definitions, in future versions, we will add support to create new meta files through tool.
