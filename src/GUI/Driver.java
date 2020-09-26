@@ -110,6 +110,7 @@ public class Driver extends JPanel
  
         editor = new JTabbedPane();
         JScrollPane jEditor = new JScrollPane(editor);
+        editor.addMouseListener(this);
         editor.setBackground(new Color(230, 255, 230)); 
         
         //Creating the project explorer pane
@@ -183,91 +184,6 @@ public class Driver extends JPanel
         splitPane.setPreferredSize(new Dimension(500, 300));
  
         add(splitPane);
-
-        editor.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) 
-            {
-                if(SwingUtilities.isRightMouseButton(e))
-                {
-                    JPopupMenu menu = new JPopupMenu();
-                    
-                    JMenuItem closer = new JMenuItem(new AbstractAction("Close") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                        	boolean sFlag = true;
-                        	if (editor.getTitleAt(editor.getSelectedIndex()).startsWith("*")) {
-                        		
-                        		Object[] options1 = {"Save",
-                                        "Don't Save", 
-                                        "Cancel"};
-
-                        		int j = JOptionPane.showOptionDialog(null,
-                                        "Save '"+editor.getTitleAt(editor.getSelectedIndex()).replace("*", "") + ".feature"+"'?",
-                                        "Save Resource!",
-                                        JOptionPane.YES_NO_CANCEL_OPTION,
-                                        JOptionPane.PLAIN_MESSAGE,
-                                        null,
-                                        options1,
-                                        null);
-                       
-						        if (j == 0) {
-						        	sFlag = true;
-						        	fn_SaveCurrentTab(editor.getSelectedIndex());
-						        } else if (j == 1) {
-						        	sFlag = true;
-						        } else {
-						        	sFlag = false;
-						        }
-                        	}
-                        	
-                        	if (sFlag) {
-                            	sOpenedTabs.remove(editor.getTitleAt(editor.getSelectedIndex()).replace("*", "") + ".feature");
-                            	TreePath[] nodeToRemove = sSelectedPath.get(editor.getSelectedIndex() + 1);
-                            	int iSelectedIndex = editor.getSelectedIndex();
-                            	editor.removeTabAt(editor.getSelectedIndex());
-                            	removeCurrentNode(project, nodeToRemove);
-                            	
-            		            Set<Integer> sKeys = sTabsList.keySet();
-            		            boolean bFlag = false;
-            		            int iTotalKeys = sKeys.size();
-            		            for(int key = 1; key<=iTotalKeys; key++) {
-    								if (key == iSelectedIndex + 1) {
-    									sTabsList.remove(key);
-    									sOriginalText.remove(key);
-    									sSelectedPath.remove(key);
-    									bFlag = true;
-    								} else if (bFlag) {
-    									sTabsList.put(key-1, sTabsList.get(key));
-    									sOriginalText.put(key-1, sOriginalText.get(key));
-    									sSelectedPath.put(key-1, sSelectedPath.get(key));
-    								}
-            		            }
-            		            
-            		            if (iTotalKeys > 1) {
-            		            	sTabsList.remove(iTotalKeys);
-            		            	sOriginalText.remove(iTotalKeys);
-            		            	sSelectedPath.remove(iTotalKeys);
-            		            }
-            		            tabIndex--;                        		
-                        	}
-                        }
-                    });
-                    
-                    JMenuItem save = new JMenuItem(new AbstractAction("Save") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                        	fn_SaveCurrentTab(editor.getSelectedIndex());
-                        }
-                    });
-                    
-                    menu.add(save);
-                    menu.add(closer);
-                    menu.show(editor, e.getX(), e.getY());
-                }
-            }
-        });        
-        
     }
     
 	/**
@@ -404,7 +320,7 @@ public class Driver extends JPanel
     
 	/**
 	 * This method is used to form the jTree for system folders
-	 **/  	
+	 **/
     public DefaultMutableTreeNode addNodes(DefaultMutableTreeNode curTop, File dir, boolean parent) {
     	
 		String curPath = dir.getPath();
@@ -464,7 +380,6 @@ public class Driver extends JPanel
             }
         }
         
- 
         fParent = new JFrame("BDD Editor");
         fParent.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         fParent.setUndecorated(true);
@@ -641,12 +556,13 @@ public class Driver extends JPanel
 	}	
 	
 	/**
-	 * This method handles the mouse click operations on both ProjectExplorer and StepDefinitin Explorer trees
+	 * This method handles the mouse click operations on both ProjectExplorer, StepDefinition Explorer trees and Editor tabs
 	 **/	
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		JTree tree = (JTree) e.getSource();
-		if (tree.getName()=="StepDefinition") {
+		
+		if (e.getSource()==stepDef) {
+			JTree tree = (JTree) e.getSource();
 			if (e.getClickCount() == 2) {
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		tree.getLastSelectedPathComponent();
@@ -658,7 +574,8 @@ public class Driver extends JPanel
 	            	}
 	            }
 			}
-		} else if (tree.getName()=="ProjectExplorer") {
+		} else if (e.getSource()==project) {
+			JTree tree = (JTree) e.getSource();
 			if (SwingUtilities.isRightMouseButton(e)) {
 			    int x = e.getX();
 			    int y = e.getY();
@@ -668,7 +585,7 @@ public class Driver extends JPanel
 			    
 			    DefaultMutableTreeNode rightClickedNode = (DefaultMutableTreeNode) path
 			        .getLastPathComponent();
-
+			    
 			    TreePath[] selectionPaths = tree.getSelectionPaths();
 
 			    boolean isSelected = false;
@@ -685,9 +602,11 @@ public class Driver extends JPanel
 			    
 			    String sFullPath = GetNodePath(rightClickedNode);
 		        
+			    File file = new File(sFullPath);
 			    if (rightClickedNode.toString().endsWith(".feature")) {
 					JPopupMenu popup = new JPopupMenu();
 					final JMenuItem DeleteFile = new JMenuItem("Delete");
+					final JMenuItem Rename = new JMenuItem("Rename");
 					
 					DeleteFile.addActionListener(new ActionListener() {
 					    public void actionPerformed(ActionEvent ev) {
@@ -714,31 +633,38 @@ public class Driver extends JPanel
 					});
 					
 					popup.add(DeleteFile);
+					popup.add(Rename);
+					
 					popup.show(tree, x, y);
-			    } else if (!sFullPath.contains(".feature") && (rightClickedNode.getChildCount() !=0)) {
+			    } else if (file.isDirectory()) {
 					JPopupMenu popup = new JPopupMenu();
 					final JMenuItem newFeatureFile = new JMenuItem("NewFeatureFile");
-					final JMenuItem DeleteFile = new JMenuItem("Delete");
-					final JMenuItem Refresh = new JMenuItem("Refresh");
+					final JMenuItem newFolder = new JMenuItem("NewFolder");
+					final JMenuItem SearchScenarios = new JMenuItem("SearchScenarios");
+					
 					newFeatureFile.addActionListener(new ActionListener() {
 					    public void actionPerformed(ActionEvent ev) {
 					        JFrame frm=new JFrame();   
 					        String name=JOptionPane.showInputDialog(frm,"Enter new feature file name \n example: test.feature");
-					        
 					        String sFullPath = GetNodePath(rightClickedNode);
-					        if (!name.contentEquals("")) {
+					        if (name.endsWith(".feature")) {
 					            try {
 					                File file = new File(sFullPath + "\\" + name);
 					                file.createNewFile();
-					             } catch(Exception e) {
+					            } catch(Exception e) {
 					                e.printStackTrace();
-					             }
+					            }
+					            updateTree(name, tree, rightClickedNode);
+					        } else if (!name.equals("")) {
+					        	msgbox("file name must have .feature extension");
 					        }
-					        updateTree(name, tree, rightClickedNode);
 					    }
 					});
 					
+					file = null;
 					popup.add(newFeatureFile);
+					popup.add(newFolder);
+					popup.add(SearchScenarios);
 					popup.show(tree, x, y);
 			    } else {
 
@@ -747,29 +673,110 @@ public class Driver extends JPanel
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		tree.getLastSelectedPathComponent();
 	            
-	            String sFullPath = GetNodePath(node);
+	            if (node != null)
+	            {
+		            String sFullPath = GetNodePath(node);
 
-	            DefaultMutableTreeNode top = null;
-	            
-	            if (node.toString().toLowerCase().endsWith(".feature")) {
-	            	if (!sOpenedTabs.contains(node.toString())) {
-	            		node.removeAllChildren();
-		            	top = ReadFeature(sFullPath);
-		            	try {
-		            		node.add(top);
-		            	} catch (Exception e3) {
-		            		node.add(new DefaultMutableTreeNode("There are no scenarios"));
+		            DefaultMutableTreeNode top = null;
+		            File file = new File(sFullPath);
+		            if (file.isFile() && sFullPath.toLowerCase().endsWith(".feature")) {
+		            	if (!sOpenedTabs.contains(node.toString())) {
+		            		node.removeAllChildren();
+			            	top = ReadFeature(sFullPath);
+			            	try {
+			            		node.add(top);
+			            	} catch (Exception e3) {
+			            		node.add(new DefaultMutableTreeNode("There are no scenarios"));
+			            	}
+		            	} else {
+		            		editor.setSelectedIndex(findTabByName(node.toString().replace(".feature","")));
 		            	}
-	            	} else {
-	            		editor.setSelectedIndex(findTabByName(node.toString().replace(".feature","")));
-	            	}
-	            	btnSave.setEnabled(true);
-	            	btnSaveAll.setEnabled(true);
+		            	btnSave.setEnabled(true);
+		            	btnSaveAll.setEnabled(true);
+		            }
+		            file = null;
+		            tree.scrollPathToVisible(new TreePath(node.getPath()));
+		            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+		            model.reload(node);	            	
 	            }
-	            tree.scrollPathToVisible(new TreePath(node.getPath()));
-	            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-	            model.reload(node);
+
 			}			
+		} else if (e.getSource()==editor) {
+            if(SwingUtilities.isRightMouseButton(e))
+            {
+                JPopupMenu menu = new JPopupMenu();
+                
+                JMenuItem closer = new JMenuItem(new AbstractAction("Close") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    	boolean sFlag = true;
+                    	if (editor.getTitleAt(editor.getSelectedIndex()).startsWith("*")) {
+                    		Object[] options1 = {"Save",
+                                    "Don't Save", 
+                                    "Cancel"};
+
+                    		int j = JOptionPane.showOptionDialog(null,
+                                    "Save '"+editor.getTitleAt(editor.getSelectedIndex()).replace("*", "") + ".feature"+"'?",
+                                    "Save Resource!",
+                                    JOptionPane.YES_NO_CANCEL_OPTION,
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    null,
+                                    options1,
+                                    null);
+                   
+					        if (j == 0) {
+					        	sFlag = true;
+					        	fn_SaveCurrentTab(editor.getSelectedIndex());
+					        } else if (j == 1) {
+					        	sFlag = true;
+					        } else {
+					        	sFlag = false;
+					        }
+                    	}
+                    	
+                    	if (sFlag) {
+                        	sOpenedTabs.remove(editor.getTitleAt(editor.getSelectedIndex()).replace("*", "") + ".feature");
+                        	TreePath[] nodeToRemove = sSelectedPath.get(editor.getSelectedIndex() + 1);
+                        	int iSelectedIndex = editor.getSelectedIndex();
+                        	editor.removeTabAt(editor.getSelectedIndex());
+                        	removeCurrentNode(project, nodeToRemove);
+                        	
+        		            Set<Integer> sKeys = sTabsList.keySet();
+        		            boolean bFlag = false;
+        		            int iTotalKeys = sKeys.size();
+        		            for(int key = 1; key<=iTotalKeys; key++) {
+								if (key == iSelectedIndex + 1) {
+									sTabsList.remove(key);
+									sOriginalText.remove(key);
+									sSelectedPath.remove(key);
+									bFlag = true;
+								} else if (bFlag) {
+									sTabsList.put(key-1, sTabsList.get(key));
+									sOriginalText.put(key-1, sOriginalText.get(key));
+									sSelectedPath.put(key-1, sSelectedPath.get(key));
+								}
+        		            }
+        		            if (iTotalKeys > 1) {
+        		            	sTabsList.remove(iTotalKeys);
+        		            	sOriginalText.remove(iTotalKeys);
+        		            	sSelectedPath.remove(iTotalKeys);
+        		            }
+        		            tabIndex--;                        		
+                    	}
+                    }
+                });
+                
+                JMenuItem save = new JMenuItem(new AbstractAction("Save") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                    	fn_SaveCurrentTab(editor.getSelectedIndex());
+                    }
+                });
+                
+                menu.add(save);
+                menu.add(closer);
+                menu.show(editor, e.getX(), e.getY());
+            }
 		}
 	}
 	
