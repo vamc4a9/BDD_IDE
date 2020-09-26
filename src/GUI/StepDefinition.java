@@ -1,17 +1,15 @@
 package GUI;
-//Java program to implement 
-//a Simple Registration Form 
-//using Java Swing 
 
-import javax.swing.*; 
+import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*; 
 import java.awt.event.*; 
 
-class MyFrame 
+class StepDefinition 
 	extends JFrame 
 	implements ActionListener { 
 
-	// Components of the Form 
 	private Container c; 
 	private JLabel title; 
 	private JLabel statement; 
@@ -37,300 +35,227 @@ class MyFrame
 		= { "WebEdit", "WebList", "DataBase", "Browser", 
 			"WebElement", "WebTable", "Auxillary", "Custom"}; 
 
-	// constructor, to initialize the components 
-	// with default values. 
-	public MyFrame(String sPath) 
+	public StepDefinition(String sPath) 
 	{ 
 		sXMLPath = sPath;
-		setTitle("Step Definition"); 
-		setDefaultCloseOperation(HIDE_ON_CLOSE);;
-		getContentPane().setBackground(new Color(230, 255, 230));
-	    setUndecorated(true);
-	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-	    setBounds(300, 90, 900, 600); 
-		setResizable(false); 
+		setFrame("Step Definition");
 
 		c = getContentPane(); 
 		c.setLayout(null); 
+		
+		Color TAborderColor = new Color(77, 166, 255);
+		Color BtnBorderColor = new Color(255, 102, 0);
+		Color RadioBtnBackGround = new Color(255, 255, 230);
 
-		title = new JLabel("Add Step Definition"); 
-		title.setFont(new Font("Arial", Font.PLAIN, 30)); 
-		title.setSize(300, 30); 
-		title.setLocation(300, 30); 
-		c.add(title); 
-
-		statement = new JLabel("Statement"); 
-		statement.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		statement.setSize(200, 20); 
-		statement.setLocation(100, 100); 
-		c.add(statement); 
-
-		tname = new JTextField(); 
-		tname.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		tname.setSize(270, 20); 
-		tname.setLocation(200, 100); 
-		c.add(tname); 
-
-		ExternalData = new JLabel("External Data?"); 
-		ExternalData.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		ExternalData.setSize(100, 20); 
-		ExternalData.setLocation(100, 150); 
-		c.add(ExternalData); 
-
-		yes = new JRadioButton("Yes"); 
-		yes.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		yes.setSelected(true); 
-		yes.setSize(75, 20); 
-		yes.setLocation(200, 150); 
-		c.add(yes); 
-
-		no = new JRadioButton("No"); 
-		no.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		no.setSelected(false); 
-		no.setSize(80, 20); 
-		no.setLocation(275, 150); 
-		c.add(no); 
+		title = fn_AddTextLabel("Add Step Definition", "Arial", 20, new Dimension(300, 30), new Point(350, 30));
+		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
+		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, "");
+		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
+		yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
+		no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), false, RadioBtnBackGround);
 
 		datagp = new ButtonGroup(); 
 		datagp.add(yes);
 		datagp.add(no);
 
-		category = new JLabel("Category");
-		category.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		category.setSize(100, 20);
-		category.setLocation(100, 200);
-		c.add(category);
-
-		StepType = new JComboBox(categoryList);
-		StepType.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		StepType.setSize(90, 20);
-		StepType.setLocation(200, 200); 
-		c.add(StepType); 
-
-		add = new JLabel("Instructions"); 
-		add.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		add.setSize(100, 20); 
-		add.setLocation(100, 250); 
-		c.add(add); 
-
-		tadd = new JTextArea(5, 20); 
-		tadd.setFont(new Font("Arial", Font.PLAIN, 13)); 
-		tadd.setSize(270, 200); 
-		tadd.setLineWrap(true);
-		tadd.setAutoscrolls(true);
-		tadd.setLocation(200, 250); 
-		c.add(tadd);
-
-		sub = new JButton("Submit"); 
-		sub.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		sub.setSize(100, 20); 
-		sub.setLocation(150, 475); 
-		sub.addActionListener(this); 
-		c.add(sub); 
-
-		reset = new JButton("Reset"); 
-		reset.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		reset.setSize(100, 20); 
-		reset.setLocation(270, 475); 
-		reset.addActionListener(this); 
-		c.add(reset); 
-
-		tout = new JTextArea(); 
-		tout.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		tout.setSize(300, 400); 
-		tout.setLocation(500, 100); 
-		tout.setLineWrap(true); 
-		tout.setEditable(false); 
-		c.add(tout); 
-
-		res = new JLabel(""); 
-		res.setFont(new Font("Arial", Font.PLAIN, 20)); 
-		res.setSize(500, 25); 
-		res.setLocation(100, 500); 
-		c.add(res); 
-
-		resadd = new JTextArea(); 
-		resadd.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		resadd.setSize(200, 75); 
-		resadd.setLocation(580, 175); 
-		resadd.setLineWrap(true); 
-		c.add(resadd); 
+		category = fn_AddTextLabel("Category", "Arial", 15, new Dimension(100, 20), new Point(100, 200));
+		StepType = fn_AddComboBox(categoryList, "Arial", 15, new Dimension(90, 20), new Point(200, 200));
+		
+		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
+		fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
+		
+		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
+		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
+		sub = fn_AddButton("Submit", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
+		reset = fn_AddButton("Reset", "Arial", 15, new Dimension(100, 20), new Point(450, 525),BtnBorderColor);
+		tout = fn_AddTextArea("Arial", 15, new Dimension(300,400), new Point(500,100),true, false, TAborderColor);
+		res = fn_AddTextLabel("", "Arial", 20, new Dimension(500, 25), new Point(100, 500));
+		resadd = fn_AddTextArea("Arial", 13, new Dimension(200, 75), new Point(580, 175),true, true, TAborderColor);
 
 		setVisible(true); 
 	} 
 	
-	public MyFrame(String sPath, String Statement, String xPath) 
+	public StepDefinition(String sPath, String Statement, String xPath) 
 	{ 
 		sXMLPath = sPath;
 		sExistingXpath = xPath + "/StepDefinition[@Statement='" + Statement + "']";
 		xml oXml = new xml();
-		String sExternalData = oXml.ReadAttribute(sPath, xPath + "/StepDefinition[@Statement='" + Statement + "']/@ExternalData");
+		String sExternalData = oXml.ReadAttribute(sPath, xPath 
+				+ "/StepDefinition[@Statement='" + Statement + "']/@ExternalData");
 		String sCategory = xPath.replace("/Meta/", "");
-		String Instructions = oXml.ReadAttribute(sPath, xPath + "/StepDefinition[@Statement='" + Statement + "']/@Instructions");
+		String Instructions = oXml.ReadAttribute(sPath, xPath 
+				+ "/StepDefinition[@Statement='" + Statement + "']/@Instructions");
 		
-		setTitle("Step Definition"); 
-		setDefaultCloseOperation(HIDE_ON_CLOSE);
-		getContentPane().setBackground(new Color(230, 255, 230));
-	    setUndecorated(true);
-	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-		setBounds(300, 90, 900, 600); 
-		setResizable(false); 
-
+		setFrame("Step Definition");
 		c = getContentPane(); 
 		c.setLayout(null); 
+		
+		Color TAborderColor = new Color(77, 166, 255);
+		Color BtnBorderColor = new Color(255, 102, 0);
+		Color RadioBtnBackGround = new Color(255, 255, 255);
 
-		title = new JLabel("Edit/Delete Step Definition"); 
-		title.setFont(new Font("Arial", Font.PLAIN, 20)); 
-		title.setSize(300, 30); 
-		title.setLocation(300, 30); 
-		c.add(title); 
+		title = fn_AddTextLabel("Edit/Delete Step Definition", "Arial", 20, new Dimension(300, 30), new Point(300, 30));
+		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
+		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, Statement);
+		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
 
-		statement = new JLabel("Statement"); 
-		statement.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		statement.setSize(200, 20); 
-		statement.setLocation(100, 100); 
-		c.add(statement); 
-
-		tname = new JTextField(); 
-		tname.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		tname.setSize(270, 20); 
-		tname.setLocation(200, 100); 
-		tname.setText(Statement);
-		c.add(tname); 
-
-		ExternalData = new JLabel("External Data?"); 
-		ExternalData.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		ExternalData.setSize(100, 20); 
-		ExternalData.setLocation(100, 150); 
-		c.add(ExternalData); 
-
-		yes = new JRadioButton("Yes"); 
-		yes.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		yes.setSelected(true); 
-		yes.setSize(75, 20); 
-		yes.setLocation(200, 150); 
 		if (sExternalData.equalsIgnoreCase("yes"))
-			yes.setEnabled(true);
-		c.add(yes); 
+			yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
+		else
+			yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), false, RadioBtnBackGround);
 
-		no = new JRadioButton("No"); 
-		no.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		no.setSelected(false); 
-		no.setSize(80, 20); 
-		no.setLocation(275, 150); 
 		if (sExternalData.equalsIgnoreCase("no"))
-			no.setEnabled(true);
-		c.add(no); 
+			no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), true, RadioBtnBackGround);
+		else
+			no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), false, RadioBtnBackGround);
 
 		datagp = new ButtonGroup(); 
 		datagp.add(yes);
 		datagp.add(no);
 
-		category = new JLabel("Category");
-		category.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		category.setSize(100, 20);
-		category.setLocation(100, 200);
-		c.add(category);
-
-		StepType = new JComboBox(categoryList);
-		StepType.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		StepType.setSize(90, 20);
-		StepType.setLocation(200, 200); 
+		category = fn_AddTextLabel("Category", "Arial", 15, new Dimension(100, 20), new Point(100, 200));
+		StepType = fn_AddComboBox(categoryList, "Arial", 15, new Dimension(90, 20), new Point(200, 200));
 		StepType.setSelectedItem(sCategory);
-		c.add(StepType); 
 
-		add = new JLabel("Instructions"); 
-		add.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		add.setSize(100, 20); 
-		add.setLocation(100, 250); 
-		c.add(add); 
-
-		tadd = new JTextArea(5, 20); 
-		tadd.setFont(new Font("Arial", Font.PLAIN, 13)); 
-		tadd.setSize(270, 200); 
-		tadd.setLineWrap(true);
-		tadd.setAutoscrolls(true);
-		tadd.setLocation(200, 250); 
-		tadd.setText(Instructions);
-		c.add(tadd);
-
-		update = new JButton("Update"); 
-		update.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		update.setSize(100, 20); 
-		update.setLocation(150, 475); 
-		update.addActionListener(this); 
-		c.add(update); 
-
-		delete = new JButton("Delete"); 
-		delete.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		delete.setSize(100, 20); 
-		delete.setLocation(270, 475); 
-		delete.addActionListener(this); 
-		c.add(delete); 
-
-		tout = new JTextArea(); 
-		tout.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		tout.setSize(300, 400); 
-		tout.setLocation(500, 100); 
-		tout.setLineWrap(true); 
-		tout.setEditable(false); 
-		c.add(tout); 
-
-		res = new JLabel(""); 
-		res.setFont(new Font("Arial", Font.PLAIN, 20)); 
-		res.setSize(500, 25); 
-		res.setLocation(100, 500); 
-		c.add(res); 
-
-		resadd = new JTextArea(); 
-		resadd.setFont(new Font("Arial", Font.PLAIN, 15)); 
-		resadd.setSize(200, 75); 
-		resadd.setLocation(580, 175); 
-		resadd.setLineWrap(true); 
-		c.add(resadd); 
+		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
+		fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
 		
-		String data1; 
-		String data 
-			= "Name : "
-			+ Statement + "\n";
-		data1 = "TestDataNeeded : " + sExternalData
-			+ "\n"; 
-		String data2 = "Category : "+ sCategory + "\n";
-
-		String data3 = "Instructions : " + Instructions;
-		tout.setText(data + data1 + data2 + data3); 
-		tout.setEditable(false); 		
+		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
+		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
+		tadd.setText(Instructions);
+		
+		update = fn_AddButton("Update", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
+		delete = fn_AddButton("Delete", "Arial", 15, new Dimension(100, 20), new Point(450, 525),BtnBorderColor);
+		tout = fn_AddTextArea("Arial", 15, new Dimension(300,400), new Point(500,100),true, false, TAborderColor);
+		tout.setText(fn_GetFinalResponse());
+		res = fn_AddTextLabel("", "Arial", 20, new Dimension(500, 25), new Point(100, 500));
+		resadd = fn_AddTextArea("Arial", 13, new Dimension(200, 75), new Point(580, 175),true, true, TAborderColor);
 
 		setVisible(true); 
 	} 	
+	
+	public void setFrame(String sTitle) {
+		setTitle(sTitle); 
+		setDefaultCloseOperation(HIDE_ON_CLOSE);;
+//		getContentPane().setBackground(new Color(255, 255, 230));
+	    setUndecorated(true);
+	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
+	    setBounds(300, 90, 900, 600); 
+	    try {
+	    	setContentPane(new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/background_stepdef.jpg")))));
+	    } catch (Exception e) {
+	    	System.out.println(e.getMessage());
+	    }
+		setResizable(false);		
+	}
 
+	public JTextArea fn_AddTextArea(String sFont, int fSize, Dimension size, 
+			Point iLocation, boolean bLineWrap, boolean bEditable, Color color) {
+		
+		c = getContentPane(); 
+		JTextArea oTextArea = new JTextArea();
+		oTextArea.setFont(new Font(sFont, Font.PLAIN, fSize));
+		oTextArea.setSize(size); 
+		oTextArea.setLocation(iLocation); 
+		oTextArea.setLineWrap(bLineWrap); 
+		oTextArea.setEditable(bEditable);
+		Border border = BorderFactory.createLineBorder(color, 2);
+		oTextArea.setBorder(border);		
+		JScrollPane scrollPane = new JScrollPane(oTextArea);
+		scrollPane.setLocation(iLocation);
+		scrollPane.setSize(size);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		
+		c.add(scrollPane);
+		return oTextArea;
+	}
+	
+	public JTextField fn_AddTextField(String sFont, int fSize, Dimension size, 
+			Point iLocation, Color color, String sDefaultText) {
+		
+		c = getContentPane(); 
+		JTextField oTextField = new JTextField();
+		oTextField.setFont(new Font(sFont, Font.PLAIN, fSize)); 
+		oTextField.setSize(size); 
+		oTextField.setLocation(iLocation); 
+		Border border = BorderFactory.createLineBorder(color, 2);
+		oTextField.setBorder(border);
+		oTextField.setText(sDefaultText);
+		c.add(oTextField);
+		
+		return oTextField;
+	}
+	
+	public JLabel fn_AddTextLabel(String sLabel, String sFont, int fSize, Dimension size, 
+			Point iLocation) {
+		c = getContentPane(); 
+		JLabel oTextLabel = new JLabel(sLabel); 
+		oTextLabel.setFont(new Font(sFont, Font.BOLD, fSize)); 
+		oTextLabel.setSize(size); 
+		oTextLabel.setLocation(iLocation); 
+		c.add(oTextLabel);
+		return oTextLabel;
+	}	
+	
+	public JButton fn_AddButton(String sLabel, String sFont, int fSize, Dimension size, 
+			Point iLocation, Color color) {
+		
+		c = getContentPane(); 
+		JButton oButton = new JButton(sLabel); 
+		oButton.setFont(new Font(sFont, Font.PLAIN, fSize)); 
+		oButton.setSize(size); 
+		oButton.setLocation(iLocation); 
+		oButton.addActionListener(this);
+		Border border = BorderFactory.createLineBorder(color, 2);
+		oButton.setBorder(border);		
+		c.add(oButton);
+		return oButton;
+	}		
+	
+	public JRadioButton fn_AddRadioButton(String sLabel, String sFont, int fSize, Dimension size, 
+			Point iLocation, boolean bSelected, Color color) {
+		
+		c = getContentPane(); 
+		JRadioButton oRadioBtn = new JRadioButton(sLabel); 
+		oRadioBtn.setFont(new Font(sFont, Font.PLAIN, fSize)); 
+		oRadioBtn.setSelected(bSelected); 
+		oRadioBtn.setSize(size); 
+		oRadioBtn.setLocation(iLocation); 	
+		Border border = BorderFactory.createLineBorder(color, 2);
+		oRadioBtn.setBorder(border);			
+		c.add(oRadioBtn);
+		return oRadioBtn;
+	}
+	
+	public JComboBox fn_AddComboBox(String[] sList, String sFont, int fSize, Dimension size, 
+			Point iLocation) {
+		
+		c = getContentPane(); 
+		JComboBox oCmbBox = new JComboBox(sList);
+		oCmbBox.setFont(new Font(sFont, Font.PLAIN, fSize));
+		oCmbBox.setSize(size);
+		oCmbBox.setLocation(iLocation);
+		c.add(oCmbBox);
+		return oCmbBox;
+		
+	}
+	
 	public void actionPerformed(ActionEvent e) 
 	{ 
 		if (e.getSource() == sub) { 
 			
 			xml oXml = new xml();
+			tout.setText(fn_GetFinalResponse());
 			
-			System.out.println("");
-			String data1; 
-			String data 
-				= "Name : "
-				+ tname.getText() + "\n";
 			String xtrnlData;
-			if (yes.isSelected()) { 
-				data1 = "TestDataNeeded : Yes"
-						+ "\n"; 
+			if (yes.isSelected()) 
 				xtrnlData = "Yes";
-			} else {
-				data1 = "TestDataNeeded : No"
-						+ "\n"; 
+			else
 				xtrnlData = "No";
-			}
-			String data2 = "Category : "+ (String)StepType.getSelectedItem() + "\n";
-
-			String data3 = "Instructions : " + tadd.getText(); 
-			tout.setText(data + data1 + data2 + data3); 
-			tout.setEditable(false); 
-			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), tname.getText(), xtrnlData, tadd.getText());
+			
+			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
+					tname.getText(), xtrnlData, tadd.getText());
+			
 			res.setText("Step Definition Added/Updated Successfully.."); 
 		}	else if (e.getSource() == reset) { 
 			String def = ""; 
@@ -340,30 +265,22 @@ class MyFrame
 			tout.setText(def); 
 			StepType.setSelectedIndex(0); 
 			resadd.setText(def); 
+			
 		} else if (e.getSource() == update) {
+			
 			xml oXml = new xml();
 			oXml.RemoveFromXml(sXMLPath, sExistingXpath);
-			System.out.println("");
-			String data1; 
-			String data 
-				= "Name : "
-				+ tname.getText() + "\n";
+			
+			tout.setText(fn_GetFinalResponse());
+			
 			String xtrnlData;
-			if (yes.isSelected()) { 
-				data1 = "TestDataNeeded : Yes"
-						+ "\n"; 
+			if (yes.isSelected()) 
 				xtrnlData = "Yes";
-			} else {
-				data1 = "TestDataNeeded : No"
-						+ "\n"; 
-				xtrnlData = "No";
-			}
-			String data2 = "Category : "+ (String)StepType.getSelectedItem() + "\n";
+			else
+				xtrnlData = "No";			
 
-			String data3 = "Instructions : " + tadd.getText(); 
-			tout.setText(data + data1 + data2 + data3); 
-			tout.setEditable(false); 
-			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), tname.getText(), xtrnlData, tadd.getText());
+			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
+					tname.getText(), xtrnlData, tadd.getText());
 			res.setText("Step Definition Updated Successfully..");
 		}else if (e.getSource() == delete) {
 			xml oXml = new xml();
@@ -377,5 +294,26 @@ class MyFrame
 			resadd.setText(def);
 			res.setText("Step Definition deleted Successfully..");
 		}
-	} 
+	} 	
+	
+	public String fn_GetFinalResponse() {
+		String data1; 
+		String data 
+			= "Name : "
+			+ tname.getText() + "\n";
+		String xtrnlData;
+		if (yes.isSelected()) { 
+			data1 = "TestDataNeeded : Yes"
+					+ "\n"; 
+			xtrnlData = "Yes";
+		} else {
+			data1 = "TestDataNeeded : No"
+					+ "\n"; 
+			xtrnlData = "No";
+		}
+		String data2 = "Category : "+ (String)StepType.getSelectedItem() + "\n";
+
+		String data3 = "Instructions : " + tadd.getText(); 
+		return data + data1 + data2 + data3;
+	}
 } 

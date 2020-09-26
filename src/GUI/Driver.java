@@ -437,12 +437,12 @@ public class Driver extends JPanel
             }
         } else if (e.getSource() == EditStepDef) {
         	if (EditStepDef.getText() == "Add") {
-        		MyFrame f = new MyFrame(sCurrentMetaFile);
+        		StepDefinition f = new StepDefinition(sCurrentMetaFile);
         	} else {
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		stepDef.getLastSelectedPathComponent();
 	            String sFullPath = GetParentNodePath(node);
-	            MyFrame f = new MyFrame(sCurrentMetaFile, node.toString(), "/"+sFullPath);
+	            StepDefinition f = new StepDefinition(sCurrentMetaFile, node.toString(), "/"+sFullPath);
         	}
         }
 	}
