@@ -63,7 +63,7 @@ public class Driver extends JPanel
 	static private final String newline = "\n";
 	private JTabbedPane editor;
 	JMenuItem oSave, oClose, oCloseAll;
-    JButton btnOpen, addNewStepDef, btnMeta, Refresh, RefreshProject, EditStepDef, btnSave, btnSaveAll;
+    JButton btnOpen, FindStepDef, btnMeta, Refresh, RefreshProject, EditStepDef, btnSave, btnSaveAll;
     public JTree stepDef;
     public JTree project;
     private Map<Integer, String> sTabsList = new HashMap<Integer, String>();
@@ -143,11 +143,11 @@ public class Driver extends JPanel
         btnMeta = new JButton("Load");
         btnMeta.addActionListener(this);
         
-        addNewStepDef = new JButton("Add");
-        addNewStepDef.addActionListener(this);
-        addNewStepDef.setEnabled(false);
+        FindStepDef = new JButton("Find");
+        FindStepDef.addActionListener(this);
+        FindStepDef.setEnabled(false);
         
-		EditStepDef = new JButton("View/Edit");
+		EditStepDef = new JButton("Add");
 		EditStepDef.setEnabled(false);
 		EditStepDef.addActionListener(this);
 		
@@ -156,7 +156,7 @@ public class Driver extends JPanel
 		Refresh.setEnabled(false);
 		
 		StepDefOpen.add(btnMeta);
-		StepDefOpen.add(addNewStepDef);
+		StepDefOpen.add(FindStepDef);
 		StepDefOpen.add(EditStepDef);
 		StepDefOpen.add(Refresh);
         StepDefExplorerPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -212,15 +212,14 @@ public class Driver extends JPanel
             		((JTree) e.getSource()).getLastSelectedPathComponent();
             try {
 	            if (node.getChildCount() == 0) {
-	            	EditStepDef.setEnabled(true);
+	            	EditStepDef.setText("View/Edit");
 	            } else {
-	            	EditStepDef.setEnabled(false);
+	            	EditStepDef.setText("Add");
 	            }
             } catch (Exception e3) {
-            	EditStepDef.setEnabled(false);
+            	EditStepDef.setText("Add");
             	System.out.println(e3.getMessage());
             }
-	            
     	}
     }
     
@@ -426,8 +425,8 @@ public class Driver extends JPanel
         	LoadMetaFile(sCurrentMetaFile);
         } else if (e.getSource() == RefreshProject){
         	LoadProjectFolder(sCurrentProject);
-        } else if (e.getSource() == addNewStepDef) {
-        	MyFrame f = new MyFrame(sCurrentMetaFile); 
+        } else if (e.getSource() == FindStepDef) {
+        	msgbox("add the functionality");
         } else if (e.getSource() == btnSave) {
         	fn_SaveCurrentTab(editor.getSelectedIndex());
         } else if (e.getSource() == btnSaveAll) {
@@ -437,10 +436,14 @@ public class Driver extends JPanel
             	fn_SaveCurrentTab(CurrentTabIndex);
             }
         } else if (e.getSource() == EditStepDef) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
-            		stepDef.getLastSelectedPathComponent();
-            String sFullPath = GetParentNodePath(node);
-            MyFrame f = new MyFrame(sCurrentMetaFile, node.toString(), "/"+sFullPath);
+        	if (EditStepDef.getText() == "Add") {
+        		MyFrame f = new MyFrame(sCurrentMetaFile);
+        	} else {
+	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
+	            		stepDef.getLastSelectedPathComponent();
+	            String sFullPath = GetParentNodePath(node);
+	            MyFrame f = new MyFrame(sCurrentMetaFile, node.toString(), "/"+sFullPath);
+        	}
         }
 	}
 	
@@ -454,7 +457,8 @@ public class Driver extends JPanel
     	stepDef.addTreeSelectionListener(this);
     	stepDef.addMouseListener(this);        	
     	StepDefExplorerPane.setBottomComponent(treeView);
-        addNewStepDef.setEnabled(true);
+    	FindStepDef.setEnabled(true);
+        EditStepDef.setEnabled(true);
         Refresh.setEnabled(true);    	
 	}
 	
