@@ -1,10 +1,14 @@
 package GUI;
 
+import javax.imageio.ImageIO;
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*; 
-import java.awt.event.*; 
+import java.awt.event.*;
+import java.io.File;
+import java.io.IOException; 
 
 class StepDefinition 
 	extends JFrame 
@@ -26,6 +30,7 @@ class StepDefinition
 	private JButton update;
 	private JButton delete;
 	private JButton reset; 
+	private JButton info;
 	private JTextArea tout; 
 	private JLabel res; 
 	private JTextArea resadd; 
@@ -58,6 +63,8 @@ class StepDefinition
 		datagp.add(yes);
 		datagp.add(no);
 
+		info = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
+	
 		category = fn_AddTextLabel("Category", "Arial", 15, new Dimension(100, 20), new Point(100, 200));
 		StepType = fn_AddComboBox(categoryList, "Arial", 15, new Dimension(90, 20), new Point(200, 200));
 		
@@ -98,6 +105,7 @@ class StepDefinition
 		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
 		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, Statement);
 		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
+		info = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
 
 		if (sExternalData.equalsIgnoreCase("yes"))
 			yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
@@ -137,7 +145,6 @@ class StepDefinition
 	public void setFrame(String sTitle) {
 		setTitle(sTitle); 
 		setDefaultCloseOperation(HIDE_ON_CLOSE);;
-//		getContentPane().setBackground(new Color(255, 255, 230));
 	    setUndecorated(true);
 	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
 	    setBounds(300, 90, 900, 600); 
@@ -210,6 +217,22 @@ class StepDefinition
 		oButton.setBorder(border);		
 		c.add(oButton);
 		return oButton;
+		
+	}		
+	
+	public JButton fn_AddIconButton(String sImage, String sFont, int fSize, Dimension size, 
+			Point iLocation) {
+		
+		c = getContentPane();
+		Icon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource(sImage)));
+		JButton oButton = new JButton(icon);
+		oButton.setFont(new Font(sFont, Font.PLAIN, fSize));
+		oButton.setSize(size); 
+		oButton.setLocation(iLocation); 
+		oButton.addActionListener(this);
+		c.add(oButton);
+		return oButton;
+		
 	}		
 	
 	public JRadioButton fn_AddRadioButton(String sLabel, String sFont, int fSize, Dimension size, 
@@ -293,6 +316,13 @@ class StepDefinition
 			StepType.setSelectedIndex(0);
 			resadd.setText(def);
 			res.setText("Step Definition deleted Successfully..");
+		} else if (e.getSource() == info) {
+			msgbox("This indicates to user if there is any"
+					+ " table content to be passed below the step definition"
+					+ "\n for example: 'Verify the below controls' statement might "
+					+ "need below table to be passed along with the statement"
+					+ "\n |ControlName1|Dispalyed|"
+					+ "\n |ControlName2|NotDisplayed|");
 		}
 	} 	
 	
@@ -316,4 +346,17 @@ class StepDefinition
 		String data3 = "Instructions : " + tadd.getText(); 
 		return data + data1 + data2 + data3;
 	}
+	
+	public void msgbox(String title) {
+		
+        JFrame oFrame = new JFrame("Message!");
+        oFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        
+        JOptionPane.showMessageDialog(oFrame,
+        		title,
+        	    "Message",
+        	    JOptionPane.INFORMATION_MESSAGE);
+        
+	}	
+	
 } 
