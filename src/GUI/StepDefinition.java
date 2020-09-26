@@ -233,6 +233,11 @@ class StepDefinition
 		JButton oButton = new JButton(icon);
 		oButton.setFont(new Font(sFont, Font.PLAIN, fSize));
 		oButton.setSize(size); 
+		oButton.setOpaque(false);
+		oButton.setFocusPainted(true);
+		oButton.setBorderPainted(false);
+		oButton.setContentAreaFilled(false);
+		oButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
 		oButton.setLocation(iLocation); 
 		oButton.addActionListener(this);
 		c.add(oButton);
@@ -413,5 +418,4 @@ class StepDefinition
         	    "Message",
         	    JOptionPane.INFORMATION_MESSAGE);
 	}	
-	
 } 

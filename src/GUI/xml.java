@@ -108,10 +108,5 @@ public class xml {
 		} catch (Exception e) {
 			
 		}
-		
-		
-		
 	}
-
-	
 }
