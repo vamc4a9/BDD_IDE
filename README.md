@@ -3,7 +3,7 @@ BDD IDE is a simple and powerful Java based editor tool which can help anyone wh
 
 Below are some of the features of this tool:
   - Add/modify step definitions
-  - Parameterize the step definitions so that while adding it to the feature file, user will know exactly what to change(WorkInProgress)
+  - Parameterize the step definitions so that while adding it to the feature file, user will know exactly what to change
   - Create feature files
   - Suupport to edit multiple feature files at once
   - search for any existing step definition with simple find functionality(WorkInProgress)
