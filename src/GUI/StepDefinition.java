@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*; 
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.List;
 
 class StepDefinition 
 	extends JFrame 
@@ -33,7 +35,8 @@ class StepDefinition
 
 	private String categoryList[] 
 		= { "WebEdit", "WebList", "DataBase", "Browser", 
-			"WebElement", "WebTable", "WebServices", "Auxillary", "Custom"}; 
+			"WebElement", "WebTable", "WebServices", 
+			"Auxillary", "Custom"}; 
 
 	public StepDefinition(String sPath) 
 	{ 
@@ -90,7 +93,7 @@ class StepDefinition
 		String Instructions = oXml.ReadAttribute(sPath, xPath 
 				+ "/StepDefinition[@Statement='" + Statement + "']/@Instructions");
 		String Parameters = oXml.ReadAttribute(sPath, xPath 
-				+ "/StepDefinition[@Statement='" + Statement + "']/@Parameters");		
+				+ "/StepDefinition[@Statement='" + Statement + "']/@Parameters");
 		
 		setFrame("Step Definition");
 		c = getContentPane(); 
@@ -149,7 +152,7 @@ class StepDefinition
 		setDefaultCloseOperation(HIDE_ON_CLOSE);;
 	    setUndecorated(true);
 	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
-	    setBounds(300, 90, 900, 600); 
+	    setBounds(300, 90, 900, 600);
 	    try {
 	    	setContentPane(new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/background_stepdef.jpg")))));
 	    } catch (Exception e) {
@@ -275,6 +278,21 @@ class StepDefinition
 				xtrnlData = "Yes";
 			else
 				xtrnlData = "No";
+			
+			if (tname.getText().contentEquals("")) {
+				msgbox("Statement is a mandatory field");
+				return;
+			}
+			
+			List<String> lData = fn_ValidateParameters();
+			if (lData.size() != 0) {
+				msgbox("Parameters are not in expected format."
+						+ "\nBelow is the expected format:\n"
+						+ "PartOfTheStatement==ShortDescription"
+						+ "\n\nIf multiple parameters are to be added, then each of them should be in new line");
+				return;
+			}
+			
 			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
 					tname.getText(), tParameters.getText(), xtrnlData, tadd.getText());
 			
@@ -294,7 +312,22 @@ class StepDefinition
 			if (yes.isSelected()) 
 				xtrnlData = "Yes";
 			else
-				xtrnlData = "No";			
+				xtrnlData = "No";
+			
+			if (tname.getText().contentEquals("")) {
+				msgbox("Statement is a mandatory field");
+				return;
+			}
+			
+			List<String> lData = fn_ValidateParameters();
+			if (lData.size() != 0) {
+				msgbox("Parameters are not in expected format."
+						+ "\nBelow is the expected format:\n"
+						+ "PartOfTheStatement==ShortDescription"
+						+ "\n\nIf multiple parameters are to be added, then each of them should be in new line");
+				return;
+			}
+			
 			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
 					tname.getText(), tParameters.getText(), xtrnlData, tadd.getText());
 			res.setText("Step Definition Updated Successfully..");
@@ -316,7 +349,7 @@ class StepDefinition
 					+ "\n |ControlName1|Dispalyed|"
 					+ "\n |ControlName2|NotDisplayed|");
 		} else if (e.getSource() == infoParameters) {
-			msgbox("If the user to parameterize the statement, when it is being added "
+			msgbox("If the user parameterize the statement, when it is being added "
 					+ "to the feature file, \nthere will be an additional pop up window displayed "
 					+ "to enter the parameter values \n\n"
 					+ "For example: if the Statement is 'Enter TestData in ObjectName control'"
@@ -333,7 +366,23 @@ class StepDefinition
 			msgbox("This is the Step Definition name \n"
 					+ "Using BDD IDE, user can import this step definition while creating the test scenario");
 		}
-	} 	
+	}
+	
+	public List<String> fn_ValidateParameters() {
+		
+		List<String> sOutput = new ArrayList<String>();
+		String sStatement = tname.getText();
+		String[] sParameters = tParameters.getText().split("\n");
+		for (String param : sParameters) {
+			if (param.contains("==")) {
+				String[] arParam = param.split("==");
+				if (!sStatement.contains(arParam[0])) {
+					sOutput.add(param);
+				}
+			}
+		}
+		return sOutput;
+	}
 	
 	public String fn_GetFinalResponse() {
 		String data1; 
@@ -357,15 +406,12 @@ class StepDefinition
 	}
 	
 	public void msgbox(String title) {
-		
         JFrame oFrame = new JFrame("Message!");
         oFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        
         JOptionPane.showMessageDialog(oFrame,
         		title,
         	    "Message",
         	    JOptionPane.INFORMATION_MESSAGE);
-        
 	}	
 	
 } 

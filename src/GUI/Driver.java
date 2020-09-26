@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -388,7 +389,7 @@ public class Driver extends JPanel
         fParent.getContentPane().setBackground(new Color(230, 255, 230));
         fParent.add(new Driver());
         fParent.setSize(1000, 600);
-        fParent.setLocation(300, 50); 
+        fParent.setLocationRelativeTo(null);
         fParent.setVisible(true);
         
     }
@@ -578,9 +579,8 @@ public class Driver extends JPanel
 			    
 	            if (node.getChildCount() == 0) {
 	            	if (editor.getSelectedIndex() >= 0) {
-			            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();
-			            oEditor.insert(node.toString(), oEditor.getCaretPosition());
-			            oEditor.insert(newline, oEditor.getCaretPosition());
+	            		String sFullPath = GetParentNodePath(node);
+				    	new ShowStepDefBeforeAdding(sCurrentMetaFile, node.toString(), "/"+sFullPath, editor);
 	            	}
 	            }
 			}
