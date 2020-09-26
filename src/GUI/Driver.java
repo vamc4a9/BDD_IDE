@@ -572,6 +572,10 @@ public class Driver extends JPanel
 			if (e.getClickCount() == 2) {
 	            DefaultMutableTreeNode node = (DefaultMutableTreeNode)
 	            		tree.getLastSelectedPathComponent();
+	            
+			    if (node == null)
+				      return;
+			    
 	            if (node.getChildCount() == 0) {
 	            	if (editor.getSelectedIndex() >= 0) {
 			            JTextArea oEditor = (JTextArea) editor.getSelectedComponent();

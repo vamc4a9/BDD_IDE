@@ -88,7 +88,7 @@ public class xml {
 		}
 	}	
 	
-	public void AddToXml(String xmlPath, String xPath, String statement, String xtrnlData, String sInstructions) {
+	public void AddToXml(String xmlPath, String xPath, String statement, String sParameters, String xtrnlData, String sInstructions) {
 		NodeList node;
 		try {
 			Document doc = GetDocumentFromXml(xmlPath);
@@ -101,6 +101,7 @@ public class xml {
 			newElement.setAttribute("Statement", statement);
 			newElement.setAttribute("ExternalData", xtrnlData);
 			newElement.setAttribute("Instructions", sInstructions);
+			newElement.setAttribute("Parameters", sParameters);
 			oEle.appendChild(newElement);
 			Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.transform(new DOMSource(doc), new StreamResult(new File(xmlPath)));

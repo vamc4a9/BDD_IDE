@@ -1,14 +1,9 @@
 package GUI;
 
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import javax.swing.border.Border;
-
 import java.awt.*; 
 import java.awt.event.*;
-import java.io.File;
-import java.io.IOException; 
 
 class StepDefinition 
 	extends JFrame 
@@ -25,20 +20,20 @@ class StepDefinition
 	private JLabel category; 
 	private JComboBox StepType; 
 	private JLabel add; 
+	private JTextArea tParameters; 
 	private JTextArea tadd; 
 	private JButton sub;
 	private JButton update;
 	private JButton delete;
 	private JButton reset; 
-	private JButton info;
+	private JButton infoStatement, infoData, infoParameters, infoInstructions;
 	private JTextArea tout; 
-	private JLabel res; 
-	private JTextArea resadd; 
+	private JLabel res;
 	private String sXMLPath, sExistingXpath;
 
 	private String categoryList[] 
 		= { "WebEdit", "WebList", "DataBase", "Browser", 
-			"WebElement", "WebTable", "Auxillary", "Custom"}; 
+			"WebElement", "WebTable", "WebServices", "Auxillary", "Custom"}; 
 
 	public StepDefinition(String sPath) 
 	{ 
@@ -55,29 +50,31 @@ class StepDefinition
 		title = fn_AddTextLabel("Add Step Definition", "Arial", 20, new Dimension(300, 30), new Point(350, 30));
 		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
 		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, "");
+		infoStatement = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
 		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
-		yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
-		no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), false, RadioBtnBackGround);
+		yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), false, RadioBtnBackGround);
+		no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), true, RadioBtnBackGround);
 
 		datagp = new ButtonGroup(); 
 		datagp.add(yes);
 		datagp.add(no);
 
-		info = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
+		infoData = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
 	
 		category = fn_AddTextLabel("Category", "Arial", 15, new Dimension(100, 20), new Point(100, 200));
 		StepType = fn_AddComboBox(categoryList, "Arial", 15, new Dimension(90, 20), new Point(200, 200));
 		
 		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
-		fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
+		tParameters = fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
+		infoParameters = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
 		
 		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
 		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
+		infoInstructions = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
 		sub = fn_AddButton("Submit", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
 		reset = fn_AddButton("Reset", "Arial", 15, new Dimension(100, 20), new Point(450, 525),BtnBorderColor);
 		tout = fn_AddTextArea("Arial", 15, new Dimension(300,400), new Point(500,100),true, false, TAborderColor);
 		res = fn_AddTextLabel("", "Arial", 20, new Dimension(500, 25), new Point(100, 500));
-		resadd = fn_AddTextArea("Arial", 13, new Dimension(200, 75), new Point(580, 175),true, true, TAborderColor);
 
 		setVisible(true); 
 	} 
@@ -92,6 +89,8 @@ class StepDefinition
 		String sCategory = xPath.replace("/Meta/", "");
 		String Instructions = oXml.ReadAttribute(sPath, xPath 
 				+ "/StepDefinition[@Statement='" + Statement + "']/@Instructions");
+		String Parameters = oXml.ReadAttribute(sPath, xPath 
+				+ "/StepDefinition[@Statement='" + Statement + "']/@Parameters");		
 		
 		setFrame("Step Definition");
 		c = getContentPane(); 
@@ -104,8 +103,9 @@ class StepDefinition
 		title = fn_AddTextLabel("Edit/Delete Step Definition", "Arial", 20, new Dimension(300, 30), new Point(300, 30));
 		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
 		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, Statement);
+		infoStatement = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
 		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
-		info = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
+		infoData = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
 
 		if (sExternalData.equalsIgnoreCase("yes"))
 			yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
@@ -126,10 +126,13 @@ class StepDefinition
 		StepType.setSelectedItem(sCategory);
 
 		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
-		fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
+		tParameters = fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
+		tParameters.setText(Parameters);
+		infoParameters = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
 		
 		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
 		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
+		infoInstructions = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
 		tadd.setText(Instructions);
 		
 		update = fn_AddButton("Update", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
@@ -137,7 +140,6 @@ class StepDefinition
 		tout = fn_AddTextArea("Arial", 15, new Dimension(300,400), new Point(500,100),true, false, TAborderColor);
 		tout.setText(fn_GetFinalResponse());
 		res = fn_AddTextLabel("", "Arial", 20, new Dimension(500, 25), new Point(100, 500));
-		resadd = fn_AddTextArea("Arial", 13, new Dimension(200, 75), new Point(580, 175),true, true, TAborderColor);
 
 		setVisible(true); 
 	} 	
@@ -266,18 +268,15 @@ class StepDefinition
 	public void actionPerformed(ActionEvent e) 
 	{ 
 		if (e.getSource() == sub) { 
-			
 			xml oXml = new xml();
 			tout.setText(fn_GetFinalResponse());
-			
 			String xtrnlData;
 			if (yes.isSelected()) 
 				xtrnlData = "Yes";
 			else
 				xtrnlData = "No";
-			
 			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
-					tname.getText(), xtrnlData, tadd.getText());
+					tname.getText(), tParameters.getText(), xtrnlData, tadd.getText());
 			
 			res.setText("Step Definition Added/Updated Successfully.."); 
 		}	else if (e.getSource() == reset) { 
@@ -287,48 +286,58 @@ class StepDefinition
 			res.setText(def); 
 			tout.setText(def); 
 			StepType.setSelectedIndex(0); 
-			resadd.setText(def); 
-			
 		} else if (e.getSource() == update) {
-			
 			xml oXml = new xml();
 			oXml.RemoveFromXml(sXMLPath, sExistingXpath);
-			
 			tout.setText(fn_GetFinalResponse());
-			
 			String xtrnlData;
 			if (yes.isSelected()) 
 				xtrnlData = "Yes";
 			else
 				xtrnlData = "No";			
-
 			oXml.AddToXml(sXMLPath, "/Meta/" + (String)StepType.getSelectedItem(), 
-					tname.getText(), xtrnlData, tadd.getText());
+					tname.getText(), tParameters.getText(), xtrnlData, tadd.getText());
 			res.setText("Step Definition Updated Successfully..");
 		}else if (e.getSource() == delete) {
 			xml oXml = new xml();
 			oXml.RemoveFromXml(sXMLPath, sExistingXpath);
 			String def = "";
-			tname.setText(def); 
+			tname.setText(def);
 			tadd.setText(def);
 			res.setText(def);
-			tout.setText(def); 
+			tout.setText(def);
 			StepType.setSelectedIndex(0);
-			resadd.setText(def);
 			res.setText("Step Definition deleted Successfully..");
-		} else if (e.getSource() == info) {
+		} else if (e.getSource() == infoData) {
 			msgbox("This indicates to user if there is any"
 					+ " table content to be passed below the step definition"
 					+ "\n for example: 'Verify the below controls' statement might "
 					+ "need below table to be passed along with the statement"
 					+ "\n |ControlName1|Dispalyed|"
 					+ "\n |ControlName2|NotDisplayed|");
+		} else if (e.getSource() == infoParameters) {
+			msgbox("If the user to parameterize the statement, when it is being added "
+					+ "to the feature file, \nthere will be an additional pop up window displayed "
+					+ "to enter the parameter values \n\n"
+					+ "For example: if the Statement is 'Enter TestData in ObjectName control'"
+					+ "\nUser can just add TestData and ObjectName as parameters \n"
+					+ "Below is the format to be followed for the above example \n\n"
+					+ "TestData==Enter the value to be updated in the object\n"
+					+ "ObjectName==Enter the object name\n\n"
+					+ "User needs to update both parameter name and some information regarding the parameter\n"
+					+ "It is not limited to add only two parameters, user can parameterize based on requirement");
+		} else if (e.getSource() == infoInstructions) {
+			msgbox("The information provided in instructions can help user understand the functionality"
+					+ "\n behind the statement");
+		} else if (e.getSource() == infoStatement) {
+			msgbox("This is the Step Definition name \n"
+					+ "Using BDD IDE, user can import this step definition while creating the test scenario");
 		}
 	} 	
 	
 	public String fn_GetFinalResponse() {
 		String data1; 
-		String data 
+		String data
 			= "Name : "
 			+ tname.getText() + "\n";
 		String xtrnlData;
