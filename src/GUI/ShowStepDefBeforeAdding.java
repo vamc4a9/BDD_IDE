@@ -2,9 +2,13 @@ package GUI;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+
+import resources.test;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 
 public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 	private Container c;
@@ -12,7 +16,7 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 	private JTextField JStatement; 
 	private ButtonGroup datagp; 
 	private String sXMLPath, sXpath;
-	private JButton jSubmit;
+	private JButton jSubmit, JInfoIcon;
 	private JTabbedPane editor;
 	
 	public ShowStepDefBeforeAdding(String sPath, String Statement, String xPath, JTabbedPane jTabPane) 
@@ -42,8 +46,8 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 		setLocationRelativeTo(null);
 		JGiven = fn_AddRadioButton("Given", "Arial", 14, new Dimension(75, 20), new Point(50, 30), true);
 		JWhen = fn_AddRadioButton("When", "Arial", 14, new Dimension(70, 20), new Point(125, 30), false);
-		JThen = fn_AddRadioButton("And", "Arial", 14, new Dimension(70, 20), new Point(195, 30), false);
-		JAnd = fn_AddRadioButton("Then", "Arial", 14, new Dimension(70, 20), new Point(265, 30), false);
+		JThen = fn_AddRadioButton("Then", "Arial", 14, new Dimension(70, 20), new Point(195, 30), false);
+		JAnd = fn_AddRadioButton("And", "Arial", 14, new Dimension(70, 20), new Point(265, 30), false);
 		datagp = new ButtonGroup(); 
 		datagp.add(JGiven);
 		datagp.add(JWhen);
@@ -54,6 +58,7 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 		
 		int iInitY = 120; 
 		if (!Parameters.contentEquals("")) {
+			JInfoIcon = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(360, 10));
 			String[] sParameters = Parameters.split("\n");
 			for (String param : sParameters) {
 				String[] arParam = param.split("==");
@@ -104,6 +109,7 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 		JRadioButton oRadioBtn = new JRadioButton(sLabel); 
 		oRadioBtn.setFont(new Font(sFont, Font.PLAIN, fSize)); 
 		oRadioBtn.setSelected(bSelected); 
+		oRadioBtn.setOpaque(false);
 		oRadioBtn.setSize(size); 
 		oRadioBtn.setLocation(iLocation); 	
 		c.add(oRadioBtn);
@@ -143,6 +149,8 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
             oEditor.insert(StepDefinitionStatement, oEditor.getCaretPosition());
             oEditor.insert("\n", oEditor.getCaretPosition());
             dispose();
+		} else if (e.getSource() == JInfoIcon) {
+			msgbox("Hover on the parameter names to see the help information");
 		}
 	}
 	
@@ -152,13 +160,45 @@ public class ShowStepDefBeforeAdding extends JFrame implements ActionListener{
 	    	if (c instanceof JTextField) {
 	    		JTextField oField = (JTextField) c;
 	    		if (!oField.getName().toLowerCase().contentEquals("StepDefStatement")) {
-	    			Statement = Statement.replace(oField.getName(), oField.getText());
+	    			if (!oField.getText().contentEquals(""))
+	    				Statement = Statement.replace(oField.getName(), oField.getText());
 	    		}
 	    	}
 	        if (c instanceof Container)
 	        	ProcessStatement((Container)c, Statement);
 	    }
 	    return Statement;
+	}
+
+	public JButton fn_AddIconButton(String sImage, String sFont, int fSize, Dimension size, 
+			Point iLocation) {
+		
+		test oTest = new test();
+		c = getContentPane();
+		URL imageURL = oTest.getClass().getResource(sImage);
+		Icon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(imageURL));
+		JButton oButton = new JButton(icon);
+		oButton.setFont(new Font(sFont, Font.PLAIN, fSize));
+		oButton.setSize(size); 
+		oButton.setOpaque(false);
+		oButton.setFocusPainted(true);
+		oButton.setBorderPainted(false);
+		oButton.setContentAreaFilled(false);
+		oButton.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+		oButton.setLocation(iLocation); 
+		oButton.addActionListener(this);
+		c.add(oButton);
+		return oButton;
+		
+	}
+	
+	public void msgbox(String title) {
+        JFrame oFrame = new JFrame("Message!");
+        oFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        JOptionPane.showMessageDialog(oFrame,
+        		title,
+        	    "Message",
+        	    JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 }

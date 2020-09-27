@@ -10,3 +10,6 @@ Below are some of the features of this tool:
   - Search for scenarios with keywords and export it to notepad(WorkInProgress)
 
 Since this is a maven project, user can just download and import this project to start working, and for now, user can only use the MetaData.xml file to add/update the step definitions, in future versions, we will add support to create new meta files through tool.
+
+27/09:
+Images and icons are now packaged into a 'BDD_Resources.jar' file, while importing this project, need to add this jar file to class path to be able to run the code successfully.

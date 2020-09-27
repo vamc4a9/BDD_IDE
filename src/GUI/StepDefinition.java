@@ -4,9 +4,10 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*; 
 import java.awt.event.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
+import resources.*;
 class StepDefinition 
 	extends JFrame 
 	implements ActionListener { 
@@ -53,7 +54,7 @@ class StepDefinition
 		title = fn_AddTextLabel("Add Step Definition", "Arial", 20, new Dimension(300, 30), new Point(350, 30));
 		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
 		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, "");
-		infoStatement = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
+		infoStatement = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
 		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
 		yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), false, RadioBtnBackGround);
 		no = fn_AddRadioButton("No", "Arial", 15, new Dimension(75, 20), new Point(275, 150), true, RadioBtnBackGround);
@@ -62,18 +63,18 @@ class StepDefinition
 		datagp.add(yes);
 		datagp.add(no);
 
-		infoData = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
+		infoData = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
 	
 		category = fn_AddTextLabel("Category", "Arial", 15, new Dimension(100, 20), new Point(100, 200));
 		StepType = fn_AddComboBox(categoryList, "Arial", 15, new Dimension(90, 20), new Point(200, 200));
 		
 		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
 		tParameters = fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
-		infoParameters = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
+		infoParameters = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
 		
 		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
 		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
-		infoInstructions = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
+		infoInstructions = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
 		sub = fn_AddButton("Submit", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
 		reset = fn_AddButton("Reset", "Arial", 15, new Dimension(100, 20), new Point(450, 525),BtnBorderColor);
 		tout = fn_AddTextArea("Arial", 15, new Dimension(300,400), new Point(500,100),true, false, TAborderColor);
@@ -106,9 +107,9 @@ class StepDefinition
 		title = fn_AddTextLabel("Edit/Delete Step Definition", "Arial", 20, new Dimension(300, 30), new Point(300, 30));
 		statement = fn_AddTextLabel("Statement", "Arial", 15, new Dimension(200, 20), new Point(100,100));
 		tname = fn_AddTextField("Arial", 15, new Dimension(270, 20), new Point(200, 100), TAborderColor, Statement);
-		infoStatement = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
+		infoStatement = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 100));
 		ExternalData = fn_AddTextLabel("Data Table?", "Arial", 15, new Dimension(100, 20), new Point(100, 150));
-		infoData = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
+		infoData = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(350, 150));
 
 		if (sExternalData.equalsIgnoreCase("yes"))
 			yes = fn_AddRadioButton("Yes", "Arial", 15, new Dimension(75, 20), new Point(200, 150), true, RadioBtnBackGround);
@@ -131,11 +132,11 @@ class StepDefinition
 		fn_AddTextLabel("Parameters", "Arial", 15, new Dimension(100, 20), new Point(100, 250));
 		tParameters = fn_AddTextArea("Arial", 13, new Dimension(270, 40), new Point(200, 250),true, true, TAborderColor);
 		tParameters.setText(Parameters);
-		infoParameters = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
+		infoParameters = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 250));
 		
 		add = fn_AddTextLabel("Instructions", "Arial", 15, new Dimension(100, 20), new Point(100, 300));
 		tadd = fn_AddTextArea("Arial", 13, new Dimension(270, 200), new Point(200, 300),true, true, TAborderColor);
-		infoInstructions = fn_AddIconButton("/resources/infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
+		infoInstructions = fn_AddIconButton("infoIcon.png", "Arial", 15, new Dimension(20, 20), new Point(475, 300));
 		tadd.setText(Instructions);
 		
 		update = fn_AddButton("Update", "Arial", 15, new Dimension(100, 20), new Point(300, 525),BtnBorderColor);
@@ -149,12 +150,14 @@ class StepDefinition
 	
 	public void setFrame(String sTitle) {
 		setTitle(sTitle); 
+		test oTest = new test();
 		setDefaultCloseOperation(HIDE_ON_CLOSE);;
 	    setUndecorated(true);
 	    getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
 	    setBounds(300, 90, 900, 600);
+	    URL imageURL = oTest.getClass().getResource("background_stepdef.jpg");
 	    try {
-	    	setContentPane(new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource("/resources/background_stepdef.jpg")))));
+	    	setContentPane(new JLabel(new ImageIcon(Toolkit.getDefaultToolkit().getImage(imageURL))));
 	    } catch (Exception e) {
 	    	System.out.println(e.getMessage());
 	    }
@@ -228,8 +231,10 @@ class StepDefinition
 	public JButton fn_AddIconButton(String sImage, String sFont, int fSize, Dimension size, 
 			Point iLocation) {
 		
+		test oTest = new test();
 		c = getContentPane();
-		Icon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(this.getClass().getResource(sImage)));
+		URL imageURL = oTest.getClass().getResource(sImage);
+		Icon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(imageURL));
 		JButton oButton = new JButton(icon);
 		oButton.setFont(new Font(sFont, Font.PLAIN, fSize));
 		oButton.setSize(size); 
@@ -252,6 +257,7 @@ class StepDefinition
 		JRadioButton oRadioBtn = new JRadioButton(sLabel); 
 		oRadioBtn.setFont(new Font(sFont, Font.PLAIN, fSize)); 
 		oRadioBtn.setSelected(bSelected); 
+		oRadioBtn.setOpaque(false);
 		oRadioBtn.setSize(size); 
 		oRadioBtn.setLocation(iLocation); 	
 		Border border = BorderFactory.createLineBorder(color, 2);
@@ -417,5 +423,5 @@ class StepDefinition
         		title,
         	    "Message",
         	    JOptionPane.INFORMATION_MESSAGE);
-	}	
+	}
 } 
