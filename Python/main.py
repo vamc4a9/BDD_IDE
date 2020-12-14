@@ -45,6 +45,15 @@ class MyGUI(tk.Frame):
 
         self.filename = ""
         self.EditorTabs = None
+
+        iDelete_icon = './icons/custom_delete.png'
+        iDelete_icon_pic1 = Image.open(iDelete_icon)  # Open the image like this first
+        self.iDelete_icon_pic2 = ImageTk.PhotoImage(iDelete_icon_pic1)
+
+        iDataTable = './icons/custom_datagrid.png'
+        iDataTable1 = Image.open(iDataTable)  # Open the image like this first
+        self.iDataTable2 = ImageTk.PhotoImage(iDataTable1)
+
         iOpen_folder = './icons/open_folder.png'
         open_folder_pic1 = Image.open(iOpen_folder)  # Open the image like this first
         self.open_folder_pic2 = ImageTk.PhotoImage(open_folder_pic1)
@@ -565,11 +574,15 @@ class MyGUI(tk.Frame):
         if self.filename == "":
             messagebox.showinfo("Information", "Please load the xml before creating the new scenario")
         else:
+
+            curr_tab = self.get_tab()
+            text = self.tabs[curr_tab].textbox
+
             root = tk.Tk()
             root.geometry("580x400")
             root.title("NewScenario")
             root.resizable(False, True)
-            myGUI = NewScenario(root, self.filename)
+            myGUI = NewScenario(root, self.filename, text)
             myGUI.CreateWindow()
             root.mainloop()
 

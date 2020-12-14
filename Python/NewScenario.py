@@ -42,7 +42,8 @@ class ScrollFrame(tk.Frame):
 
 
 class NewScenario():
-    def __init__(self, root, filename):
+    def __init__(self, root, filename, text):
+        self.textEditor = text
         self.root = root
         self.StepType = {}
         self.StepDetail = {}
@@ -61,7 +62,6 @@ class NewScenario():
         self.scenarioType = None
         self.AllStatements = []
         oXml = cXml(self.filename)
-        # print(oXml.ReadFile())
         sKeys = self.read_config("XML", "keys")
         self.autocompl = Autocompleter()
         df = self.autocompl.import_xml(filename)
@@ -78,7 +78,7 @@ class NewScenario():
     def getImage(self, sCollection, sKey):
         sImgPath = self.read_config(sCollection, sKey)
         img1 = Image.open(sImgPath)
-        self.sImages[sKey] = ImageTk.PhotoImage(img1)
+        self.sImages[sKey] = ImageTk.PhotoImage(img1, master=self.root)
 
     def CreateWindow(self):
         frame = tk.Frame(self.root)
@@ -188,6 +188,7 @@ class NewScenario():
                 sReturn = sReturn + "\n    " + line
             sReturn = sReturn + "\n\n" + line
 
+        self.textEditor.insert('end', sReturn)
         print(sReturn)
 
     def move(self, event, iRowIndex):
@@ -377,7 +378,7 @@ class NewScenario():
                 list.append(key)
             iNewIndex = list[-1] + 1
 
-        self.StepDelete[iNewIndex - 1] = tk.Button(frame, image=self.sImages["DeleteIcon"],
+        self.StepDelete[iNewIndex - 1] = tk.Button(self.scrollFrame.viewPort, image=self.sImages['DeleteIcon'] ,
                                                    command=lambda: self.deleteStep(frame, (iRow - 6) / 2))
         self.StepDelete[iNewIndex - 1].grid(row=iRow, column=iCol)
 
@@ -390,7 +391,7 @@ class NewScenario():
                 list.append(key)
             iNewIndex = list[-1] + 1
 
-        self.StepDTButton[iNewIndex - 1] = tk.Button(frame, image=self.sImages["custom_datagrid"],
+        self.StepDTButton[iNewIndex - 1] = tk.Button(self.scrollFrame.viewPort, image=self.sImages['custom_datagrid'] ,
                                                      command=lambda: self.AddDataTable((iRow - 6) / 2,"DataTable"))
         self.StepDTButton[iNewIndex - 1].grid(row=iRow, column=iCol)
 
@@ -410,6 +411,6 @@ if __name__ == "__main__":
     root.title("NewScenario")
     root.resizable(False, True)
     # Example(root).pack(side="top", fill="both", expand=True)
-    myGUI = NewScenario(root, "C:\\Users\\vamsi\\Documents\\MetaData.xml")
+    myGUI = NewScenario(root, "C:\\Users\\vamsi\\Documents\\MetaData.xml", None)
     myGUI.CreateWindow()
     root.mainloop()
