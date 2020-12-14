@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Meta>
+	<Feature>
+		<word>Feature:</word>
+		<StartLine>true</StartLine>
+		<foreground>blue</foreground>
+	</Feature>
+	<Given>
+		<word>Given</word>
+		<StartLine>true</StartLine>
+		<foreground>green</foreground>
+	</Given>
+	<When>
+		<word>When</word>
+		<StartLine>true</StartLine>
+		<foreground>green</foreground>
+	</When>
+	<Then>
+		<word>Then</word>
+		<StartLine>true</StartLine>
+		<foreground>green</foreground>
+	</Then>
+	<And>
+		<word>And</word>
+		<StartLine>true</StartLine>
+		<foreground>green</foreground>
+	</And>
+	<doublequotes>
+		<word>"</word>
+		<StartLine>false</StartLine>
+		<foreground>green</foreground>
+	</doublequotes>
+	
+</Meta>
