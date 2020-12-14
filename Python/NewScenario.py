@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
 from configparser import ConfigParser
-import pandas as pd
 from PIL import Image, ImageTk
 
 from autocompleter import Autocompleter
@@ -169,7 +168,7 @@ class NewScenario():
         bExamples = False
         sReturn = "    " + self.tags.get() + "\n"
         sReturn = sReturn + "    " + self.scenarioType.get() + ": " + self.scenarioname.get()
-        if self.sExamplesTable != None:
+        if self.sExamplesTable is not None:
             bExamples = True
 
         for key in self.StepType.keys():
@@ -188,8 +187,9 @@ class NewScenario():
                 sReturn = sReturn + "\n    " + line
             sReturn = sReturn + "\n\n" + line
 
+        self.textEditor.insert('end', "\n")
         self.textEditor.insert('end', sReturn)
-        print(sReturn)
+        self.root.destroy()
 
     def move(self, event, iRowIndex):
         AutoSuggestions = self.autocompl.generate_completions(self.StepDetail[iRowIndex].get(), self.new_df,

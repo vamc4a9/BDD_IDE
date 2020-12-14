@@ -122,20 +122,6 @@ class MyGUI(tk.Frame):
         self.ProjectExplorerTree = None
         self.StepDefExplorerTree = None
 
-    def maketags(self, text):
-        text.tag_config("feature", foreground="blue", underline=1)
-        text.tag_config("scenario", foreground="green", underline=1)
-        text.tag_config("scenariooutline", foreground="blue", underline=1)
-        text.tag_config("given", foreground="cyan", underline=1)
-        text.tag_config("when", foreground="cyan", underline=1)
-        text.tag_config("then", foreground="cyan", underline=1)
-        text.tag_config("and", foreground="cyan", underline=1)
-        text.tag_config("doublequotes", foreground="grey", underline=1)
-        return text
-
-    def sample(self):
-        print("add functionality")
-
     def CreateGUI(self):
 
         # master = Tk()
@@ -478,7 +464,8 @@ class MyGUI(tk.Frame):
             idx = re.search("Given", sChars)
             startIndex = str(sChars.index("Given"))
             endIndex = str(sChars.index("Given") + 5)
-            text.tag_add('given', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "." + endIndex)
+            text.tag_add('given', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "."
+                         + endIndex)
             text.see(sCursorPos.split(".")[0] + "." + endIndex)
             text.tag_config('given', foreground='purple')
         elif line.startswith("When"):
@@ -506,21 +493,24 @@ class MyGUI(tk.Frame):
             idx = re.search("Feature:", sChars)
             startIndex = str(sChars.index("Feature:"))
             endIndex = str(sChars.index("Feature:") + 8)
-            text.tag_add('feature', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "." + endIndex)
+            text.tag_add('feature', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "."
+                         + endIndex)
             text.see(sCursorPos.split(".")[0] + "." + endIndex)
             text.tag_config('feature', foreground='blue')
         elif line.startswith("Scenario:"):
             idx = re.search("Scenario:", sChars)
             startIndex = str(sChars.index("Scenario:"))
             endIndex = str(sChars.index("Scenario:") + 9)
-            text.tag_add('Scenario', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "." + endIndex)
+            text.tag_add('Scenario', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "."
+                         + endIndex)
             text.see(sCursorPos.split(".")[0] + "." + endIndex)
             text.tag_config('Scenario', foreground='green')
         elif line.startswith("Scenario Outline:"):
             idx = re.search("Scenario Outline:", sChars)
             startIndex = str(sChars.index("Scenario Outline:"))
             endIndex = str(sChars.index("Scenario Outline:") + 17)
-            text.tag_add('Scenario', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "." + endIndex)
+            text.tag_add('Scenario', sCursorPos.split(".")[0] + "." + startIndex, sCursorPos.split(".")[0] + "."
+                         + endIndex)
             text.see(sCursorPos.split(".")[0] + "." + endIndex)
             text.tag_config('Scenario', foreground='green')
 
@@ -625,7 +615,8 @@ class MyGUI(tk.Frame):
                     iInitY = iInitY + 40
                     mParamDict[arIndParams[0]] = entry2
 
-        button = tk.Button(frame, text="Submit", bg='Light gray', fg='red', command=lambda: self.AddStatement(var.get() + " " + statement,mParamDict, stepDefRoot))
+        button = tk.Button(frame, text="Submit", bg='Light gray', fg='red',
+                           command=lambda: self.AddStatement(var.get() + " " + statement,mParamDict, stepDefRoot))
         button.place(x=150, y=iInitY)
 
         stepDefRoot.geometry("400x" + str(iInitY + 70))
