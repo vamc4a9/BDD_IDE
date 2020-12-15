@@ -14,6 +14,14 @@ class cXml:
         tree = etree.parse(self.xmlPath)
         item = tree.xpath(sXPath)[0]
         item.text = sValue
+        self.SaveXML(tree)
+
+    def RemoveNode(self, sXPath):
+        tree = etree.fromstring(self.xmlPath)
+        for bad in tree.xpath(sXPath):
+            bad.getparent().remove(bad)  # here I grab the parent of the element to call the remove directly on it
+
+        self.SaveXML(tree)
 
     def insertNode(self, sParent, statement, parameters, xtrnlData, instructions):
         tree = etree.parse(self.xmlPath)
@@ -24,7 +32,9 @@ class cXml:
         node_element.set("ExternalData", xtrnlData)
         node_element.set("Instructions", instructions)
         parent.insert(1, node_element)
+        self.SaveXML(tree)
 
+    def SaveXML(self, tree):
         obj_xml = etree.tostring(tree,
                                  pretty_print=True,
                                  xml_declaration=True)

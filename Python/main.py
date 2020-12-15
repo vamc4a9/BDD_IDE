@@ -1,6 +1,7 @@
 import os
 
 from NewScenario import NewScenario
+from StepDefinition import AddStepDefinition
 from xml import cXml
 import tkinter as tk
 from hashlib import md5
@@ -180,7 +181,7 @@ class MyGUI(tk.Frame):
         self.FindBtn = Button(StepDefExplorerControls, text="Find", fg="red", width=10)
         self.FindBtn.pack(side=LEFT)
         self.FindBtn["state"] = "disabled"
-        self.View_Edit_Btn = Button(StepDefExplorerControls, text="Add", fg="red", width=10)
+        self.View_Edit_Btn = Button(StepDefExplorerControls, text="Add", fg="red", width=10, command=self.AddStepDefinition)
         self.View_Edit_Btn.pack(side=LEFT)
         self.View_Edit_Btn["state"] = "disabled"
         self.StepDefRefreshBtn = Button(StepDefExplorerControls, text="Refresh", fg="red", width=10)
@@ -914,6 +915,41 @@ class MyGUI(tk.Frame):
 
     def redo(self, *args):
         self.tabs[self.get_tab()].textbox.edit_redo()
+
+    def AddStepDefinition(self):
+        if self.View_Edit_Btn.cget('text') == 'Add':
+            root = tk.Tk()
+            app = AddStepDefinition(root, self.filename, '')
+            app.CreateUI()
+            root.mainloop()
+        else:
+            root = tk.Tk()
+            curItem = self.StepDefExplorerTree.focus()
+            oXml = cXml(self.filename)
+            statement = self.StepDefExplorerTree.item(curItem)["text"]
+            parameters = oXml.ReadNode("//StepDefinition[@Statement='"+statement+"']/@Parameters")
+            instructions = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@Instructions")
+            xtrnlData = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@ExternalData")
+            parent_iid = self.StepDefExplorerTree.parent(curItem)
+            app = AddStepDefinition(root, self.filename, "//StepDefinition[@Statement='"+statement+"']")
+            app.CreateUI()
+            app.entry.insert(0, statement)
+            app.instructionstext.insert('end', "".join(instructions))
+            app.parametertext.insert('end', "".join(parameters))
+            if "".join(xtrnlData) == 'Yes':
+                app.R1.select()
+            else:
+                app.R2.select()
+            sKeys = self.read_config("XML", "keys")
+            arKeys = sKeys.split(",")
+            app.OptionList.current(arKeys.index(self.StepDefExplorerTree.item(parent_iid)['text']))
+            sOutput = "Statement: " + statement\
+               + "\n\nCategory: " + self.StepDefExplorerTree.item(parent_iid)['text'] \
+               + "\n\nExternalData: " + "".join(xtrnlData) \
+               + "\n\nParameters: " + "".join(parameters) \
+               + "\n\nInstructions: " + "".join(instructions)
+            app.Outputtext.insert('end', sOutput)
+            root.mainloop()
 
     def stepdefload(self):
         self.filename = filedialog.askopenfilename(initialdir="/",
