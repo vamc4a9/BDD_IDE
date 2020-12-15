@@ -17,7 +17,7 @@ class cXml:
         self.SaveXML(tree)
 
     def RemoveNode(self, sXPath):
-        tree = etree.fromstring(self.xmlPath)
+        tree = etree.parse(self.xmlPath)
         for bad in tree.xpath(sXPath):
             bad.getparent().remove(bad)  # here I grab the parent of the element to call the remove directly on it
 

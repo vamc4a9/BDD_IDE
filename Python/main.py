@@ -184,7 +184,7 @@ class MyGUI(tk.Frame):
         self.View_Edit_Btn = Button(StepDefExplorerControls, text="Add", fg="red", width=10, command=self.AddStepDefinition)
         self.View_Edit_Btn.pack(side=LEFT)
         self.View_Edit_Btn["state"] = "disabled"
-        self.StepDefRefreshBtn = Button(StepDefExplorerControls, text="Refresh", fg="red", width=10)
+        self.StepDefRefreshBtn = Button(StepDefExplorerControls, text="Refresh", fg="red", width=10, command=self.RefreshXML)
         self.StepDefRefreshBtn.pack(side=LEFT)
         self.StepDefRefreshBtn["state"] = "disabled"
         StepDefExplorer.add(StepDefExplorerControls)
@@ -534,16 +534,14 @@ class MyGUI(tk.Frame):
         self.ProjectExplorerTree.selection_set(item)
         self.popup = Menu(root, tearoff=0)
         isdir = os.path.isdir(item)
+        isFile = os.path.isfile(item)
         if item is not "":
             if isdir:
                 self.popup.add_command(label="New File", command=lambda: self.CreateNewFile(item))
                 self.popup.add_separator()
                 self.popup.add_command(label="Delete", command=lambda: self.deleteFile(item))
-                self.popup.add_command(label="Search Scenarios", command=lambda: self.closeWindow())
-            elif item.endswith(".feature"):
-                self.popup.add_command(label="Rename", command=lambda: self.renameFile(item))
-                self.popup.add_command(label="Delete", command=lambda: self.deleteFile(item))
-            else:
+                # self.popup.add_command(label="Search Scenarios", command=lambda: self.closeWindow())
+            elif isFile:
                 self.popup.add_command(label="Rename", command=lambda: self.renameFile(item))
                 self.popup.add_command(label="Delete", command=lambda: self.deleteFile(item))
 
@@ -752,8 +750,6 @@ class MyGUI(tk.Frame):
                 break
         file.close()
         self.ReadScenarios(item, newParentIID)
-        sNewLine = ""
-        # return sNewLine.join(Lines)
         return Lines
 
     def ReadScenarios(self, sFile, item):
@@ -960,7 +956,25 @@ class MyGUI(tk.Frame):
         tree = self.StepDefExplorerTree
         if self.filename != "":
             oXml = cXml(self.filename)
+            tree.delete(*tree.get_children())
+            tree.insert('', '0', self.filename, text=self.filename, image=self.folder_pic2, open=True)
+            sKeys = self.read_config("XML", "keys")
+            arKeys = sKeys.split(",")
+            for key in arKeys:
+                self.getImage("XML", key)
+                tree.insert(self.filename, 'end', iid=key, text=key, image=self.sXMLImages[key])
+                sValues = oXml.ReadNode("//" + key + "/StepDefinition/@Statement")
+                for value in sValues:
+                    tree.insert(key, 'end', iid="//" + key + "/StepDefinition[@Statement='" + value + "']", text=value,
+                                image=self.step_pic2)
+            self.FindBtn["state"] = "normal"
+            self.View_Edit_Btn["state"] = "normal"
+            self.StepDefRefreshBtn["state"] = "normal"
 
+    def RefreshXML(self):
+        tree = self.StepDefExplorerTree
+        if self.filename != "":
+            oXml = cXml(self.filename)
             tree.delete(*tree.get_children())
             tree.insert('', '0', self.filename, text=self.filename, image=self.folder_pic2, open=True)
             sKeys = self.read_config("XML", "keys")

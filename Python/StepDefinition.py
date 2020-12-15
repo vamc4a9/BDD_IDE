@@ -5,6 +5,8 @@ import tkinter.ttk as ttk
 from tkinter.scrolledtext import ScrolledText
 import tkinter.font as font
 from tkinter import messagebox
+
+from autocompleter import Autocompleter
 from xml import cXml
 
 class AddStepDefinition:
@@ -25,6 +27,8 @@ class AddStepDefinition:
         self.parametertext = None
         self.instructionstext = None
         self.ConfirmationMessage = None
+        self.SubmitBtn = None
+        self.DeleteBtn = None
         self.StepDefVar = StringVar()
         self.StepDefVar.set("Welcome To Add Step Definition Window")
         self.info = tk.PhotoImage(file='./icons/info_icon.png', master=self.root)
@@ -121,29 +125,28 @@ class AddStepDefinition:
         self.Outputtext.place(relx=0.58, rely=0.2, relwidth=0.3, relheight=0.65)
 
         if self.sOldXPath == '':
-            button = tk.Button(frame, text="Submit", bg='Light gray', fg='red',
+            self.SubmitBtn = tk.Button(frame, text="Submit", bg='Light gray', fg='red',
                                command=lambda: self.addDatatoXML())
-            button.place(relx=0.34, rely=0.89, relwidth=0.13, relheight=0.045)
-            button['font'] = self.myFont3
+            self.SubmitBtn.place(relx=0.34, rely=0.89, relwidth=0.13, relheight=0.045)
+            self.SubmitBtn['font'] = self.myFont3
         else:
-            button = tk.Button(frame, text="Update", bg='Light gray', fg='red',
-                               command=lambda: self.addDatatoXML())
-            button.place(relx=0.34, rely=0.89, relwidth=0.13, relheight=0.045)
-            button['font'] = self.myFont3
+            self.DeleteBtn = tk.Button(frame, text="Update", bg='Light gray', fg='red',
+                               command=lambda: self.UpdateXML())
+            self.DeleteBtn.place(relx=0.34, rely=0.89, relwidth=0.13, relheight=0.045)
+            self.DeleteBtn['font'] = self.myFont3
 
         if self.sOldXPath == '':
             button = tk.Button(frame, text="Reset", bg='Light gray', fg='red', command=lambda: self.reset())
             button.place(relx=0.51, rely=0.89, relwidth=0.13, relheight=0.045)
             button['font'] = self.myFont3
         else:
-            button = tk.Button(frame, text="Delete", bg='Light gray', fg='red', command=lambda: self.reset())
+            button = tk.Button(frame, text="Delete", bg='Light gray', fg='red', command=lambda: self.delete())
             button.place(relx=0.51, rely=0.89, relwidth=0.13, relheight=0.045)
             button['font'] = self.myFont3
 
         self.ConfirmationMessage = tk.Label(frame, text="", bg='#d9ecd0', anchor=W)
         self.ConfirmationMessage.place(relx=0.30, rely=0.95, relwidth=0.40, relheight=0.05)
         self.ConfirmationMessage['font'] = self.myFont1
-        # self.AddSuccess.pack_forget()
 
     def read_config(self, sCollection, sKey):
         # Read config.ini file
@@ -151,6 +154,37 @@ class AddStepDefinition:
         config_object.read("config.ini")
         userinfo = config_object[sCollection]
         return userinfo[sKey]
+
+    def delete(self):
+        xml = cXml(self.filename)
+        xml.RemoveNode(self.sOldXPath)
+        self.reset()
+        messagebox.showwarning('Message', 'step definition is deleted successfully', parent=self.root)
+        self.root.destroy()
+        # self.ConfirmationMessage.config(text="step definition is deleted successfully")
+
+    def UpdateXML(self):
+        xml = cXml(self.filename)
+        xml.RemoveNode(self.sOldXPath)
+        self.Outputtext.delete("1.0", END)
+        if self.AddToXML():
+            messagebox.showwarning('Message', 'Step definition is updated successfully', parent=self.root)
+            self.sOldXPath = "//StepDefinition[@Statement='"+self.entry.get().strip()+"']"
+
+    def AddToXML(self):
+        xml = cXml(self.filename)
+        sData = xml.ReadNode("//StepDefinition[@Statement='"+self.entry.get().strip()+"']")
+        if len(sData) > 0:
+            messagebox.showwarning('Warning Message', 'There is an existing step definition with same statement'
+                                   , parent=self.root)
+            return False
+        else:
+            xml.insertNode("//" + self.OptionList.get(), self.entry.get().strip(),
+                           self.parametertext.get("1.0", tk.END).strip(),
+                           self.GetRadiobutton(), self.instructionstext.get("1.0", tk.END).strip())
+
+            self.Outputtext.insert('end', self.GetOutput())
+            return True
 
     def reset(self):
         self.entry.delete(0, END)
@@ -160,6 +194,10 @@ class AddStepDefinition:
         self.OptionList.current(0)
         self.Outputtext.delete("1.0", END)
         self.ConfirmationMessage.config(text="")
+        if self.sOldXPath == '':
+            self.SubmitBtn["state"] = "normal"
+        else:
+            self.DeleteBtn["state"] = "normal"
 
     def GetRadiobutton(self):
         if self.extdata.get() == 'No':
@@ -176,23 +214,32 @@ class AddStepDefinition:
 
     def addDatatoXML(self):
         if self.entry.get() == '':
-            messagebox.showwarning('Warning Message', 'Statement should not be empty')
+            messagebox.showwarning('Warning Message', 'Statement should not be empty', parent=self.root)
         elif self.checkParameters():
-            xml = cXml(self.filename)
-            xml.insertNode("//" + self.OptionList.get(), self.entry.get().strip(),
-                           self.parametertext.get("1.0", tk.END).strip(),
-                           self.GetRadiobutton(), self.instructionstext.get("1.0", tk.END).strip())
+            self.autocompl = Autocompleter()
+            df = self.autocompl.import_xml(self.filename)
+            self.new_df = self.autocompl.process_data(df)
+            self.model_tf, self.tfidf_matrice = self.autocompl.calc_matrice(self.new_df)
+            AutoSuggestions = self.autocompl.generate_completions(self.entry.get().strip(), self.new_df,
+                                                                  self.model_tf, self.tfidf_matrice)
 
-            self.Outputtext.insert('end', self.GetOutput())
-            self.ConfirmationMessage.config(text="step definition is added successfully")
-            # self.StepDefVar.set("step definition is added successfully")
+            sMessage = "Please check if one of the below can perform your operation\n"
+            for suggestion in AutoSuggestions:
+                sMessage = sMessage + "\n" + suggestion
 
+            sMessage = sMessage + "\n\nIf you click on Yes, new step definition will not get added"
+            answer = messagebox.askyesno('Auto Suggestions Based on Existing Step Definitions', sMessage, parent=self.root)
+            # print(answer)
+            if not answer:
+                if self.AddToXML():
+                    messagebox.showwarning('Warning Message', 'Step definition is added successfully', parent=self.root)
+                    self.SubmitBtn["state"] = "disabled"
         else:
             messagebox.showwarning('Warning Message', "Parameters are not in expected format."
                                                       "\nBelow is the expected format:\n"
                                                       "PartOfTheStatement==ShortDescription"
                                                       "\n\nIf multiple parameters are to be added, then each of "
-                                                      "them should be in new line")
+                                                      "them should be in new line", parent=self.root)
 
     def checkParameters(self):
         if self.parametertext.get("1.0", tk.END).strip() != '':
@@ -220,7 +267,7 @@ class AddStepDefinition:
     def statement_info_function(self):
         messagebox.showinfo("Message",
                             "This is the Step defintion Name. Using BDD IDE, User can import this step definition "
-                            "while creating the test scenario.")
+                            "while creating the test scenario.", parent=self.root)
 
     def datatable_info_function(self):
         messagebox.showinfo("Message",
@@ -228,7 +275,7 @@ class AddStepDefinition:
                             "step definition \nFor Eg: 'Verify the below controls' statement might need below "
                             "table to be passed along with the statement: "
                             "\n|ControlName1|Displayed|"
-                            "\n|ControlName2|NotDisplayed|")
+                            "\n|ControlName2|NotDisplayed|", parent=self.root)
 
     def datatable_info_function(self):
         messagebox.showinfo("Message",
@@ -236,7 +283,7 @@ class AddStepDefinition:
                             "definition. \nFor Eg: 'Verify the below controls' statement might need below table"
                             " to be passed along with the statement: "
                             "\n|ControlName1|Displayed|"
-                            "\n|ControlName2|NotDisplayed|")
+                            "\n|ControlName2|NotDisplayed|", parent=self.root)
 
     def parameters_info_function(self):
         messagebox.showinfo("Message",
@@ -248,12 +295,13 @@ class AddStepDefinition:
                             "\n\nTestData==Enter the value to be updated in the object "
                             "\nObjectName==Enter the object name "
                             "\n\nUser needs to update both parameter name and some information regarding the parameter."
-                            " It is not limited to add only 2 parameters, user can parameterize based on requirement")
+                            " It is not limited to add only 2 parameters, user can parameterize based on requirement"
+                            , parent=self.root)
 
     def instructions_info_function(self):
         messagebox.showinfo("Message",
                             "The Information provided in 'Instructions' can help user understand the functionality "
-                            "behind the statement")
+                            "behind the statement", parent=self.root)
 
 
 if __name__ == "__main__":
