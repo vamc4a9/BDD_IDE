@@ -228,7 +228,8 @@ class AddStepDefinition:
                 sMessage = sMessage + "\n" + suggestion
 
             sMessage = sMessage + "\n\nIf you click on Yes, new step definition will not get added"
-            answer = messagebox.askyesno('Auto Suggestions Based on Existing Step Definitions', sMessage, parent=self.root)
+            answer = messagebox.askyesno('Auto Suggestions Based on Existing Step Definitions', sMessage,
+                                         parent=self.root)
             # print(answer)
             if not answer:
                 if self.AddToXML():

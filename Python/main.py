@@ -1,5 +1,6 @@
 import os
 
+from EditScenario import EditScenario
 from NewScenario import NewScenario
 from StepDefinition import AddStepDefinition
 from xml import cXml
@@ -12,14 +13,17 @@ from PIL import Image, ImageTk
 from configparser import ConfigParser
 import re
 
+
 class Document:
     def __init__(self, Frame, TextWidget):
         self.textbox = TextWidget
         self.status = md5(self.textbox.get(1.0, 'end').encode('utf-8'))
 
+
 class MyGUI(tk.Frame):
     def __init__(self, master):
 
+        self.root = master
         # self.img = None
         self.scenarioWindow = None
         self.statusvar = StringVar()
@@ -145,18 +149,13 @@ class MyGUI(tk.Frame):
         ProjectExplorer.pack(fill=BOTH, expand=1)
 
         ProjectExplorerControls = Frame(ProjectExplorer)
-        # self.ProjectExplorerTree = self.create_tree_widget(master)
-        self.ProjectExplorerTree = ttk.Treeview(master, show="tree")
-        self.set_scrollbar(self.ProjectExplorerTree, ProjectExplorer)
-        self.ProjectExplorerTree.bind("<Double-1>", self.OnProjectDoubleClick)
-        self.ProjectExplorerTree.bind("<Button-3>", self.do_popup)
-
         self.OpenBtn = Button(ProjectExplorerControls, text="Open", width=10, fg="red", command=self.browse_project)
         self.OpenBtn.pack(side=LEFT)
         self.SaveBtn = Button(ProjectExplorerControls, text="Save", fg="red", width=10, command=self.save_current_tab)
         self.SaveBtn.pack(side=LEFT)
         self.SaveBtn["state"] = "disabled"
-        self.SaveAllBtn = Button(ProjectExplorerControls, text="SaveAll", fg="red", width=10, command=self.save_all_tabs)
+        self.SaveAllBtn = Button(ProjectExplorerControls, text="SaveAll", fg="red", width=10,
+                                 command=self.save_all_tabs)
         self.SaveAllBtn.pack(side=LEFT)
         self.SaveAllBtn["state"] = "disabled"
         self.RefreshBtn = Button(ProjectExplorerControls, text="Refresh", fg="red", width=10)
@@ -164,14 +163,23 @@ class MyGUI(tk.Frame):
         self.RefreshBtn["state"] = "disabled"
         ProjectExplorer.add(ProjectExplorerControls)
 
-        ProjectExplorer.add(ProjectExplorerControls)
+        # ProjectExplorerFrame = tk.Frame(master,
+        #                          background="#ffffff")
+        self.ProjectExplorerTree = ttk.Treeview(master, show="tree")
+        self.set_scrollbar(self.ProjectExplorerTree, ProjectExplorer)
+        self.ProjectExplorerTree.bind("<Double-1>", self.OnProjectDoubleClick)
+        self.ProjectExplorerTree.bind("<Button-3>", self.do_popup)
+
         ProjectExplorer.add(self.ProjectExplorerTree)
+
+        # ProjectExplorer.add(ProjectExplorerFrame)
 
         StepDefExplorer = PanedWindow(ExplorerPane, orient=VERTICAL)
         StepDefExplorer.pack(fill=BOTH, expand=1)
 
         StepDefExplorerControls = Frame(StepDefExplorer)
         self.StepDefExplorerTree = ttk.Treeview(master, show="tree")
+        # self.StepDefExplorerTree = self.set_scrollbar(master, StepDefExplorer)
         self.set_scrollbar(self.StepDefExplorerTree, StepDefExplorer)
         self.StepDefExplorerTree.bind("<Double-1>", self.onStepDefDoubleClick)
         self.StepDefExplorerTree.bind("<Button-1>", self.RenameViewBtn)
@@ -181,10 +189,12 @@ class MyGUI(tk.Frame):
         self.FindBtn = Button(StepDefExplorerControls, text="Find", fg="red", width=10)
         self.FindBtn.pack(side=LEFT)
         self.FindBtn["state"] = "disabled"
-        self.View_Edit_Btn = Button(StepDefExplorerControls, text="Add", fg="red", width=10, command=self.AddStepDefinition)
+        self.View_Edit_Btn = Button(StepDefExplorerControls, text="Add", fg="red", width=10,
+                                    command=self.AddStepDefinition)
         self.View_Edit_Btn.pack(side=LEFT)
         self.View_Edit_Btn["state"] = "disabled"
-        self.StepDefRefreshBtn = Button(StepDefExplorerControls, text="Refresh", fg="red", width=10, command=self.RefreshXML)
+        self.StepDefRefreshBtn = Button(StepDefExplorerControls, text="Refresh", fg="red", width=10,
+                                        command=self.RefreshXML)
         self.StepDefRefreshBtn.pack(side=LEFT)
         self.StepDefRefreshBtn["state"] = "disabled"
         StepDefExplorer.add(StepDefExplorerControls)
@@ -219,7 +229,7 @@ class MyGUI(tk.Frame):
         self.popup = Menu(root, tearoff=0)
         self.popup.add_command(label="Save (CTRL+S)", image=self.savetab_pic2, compound=tk.LEFT,
                                command=lambda: self.save_current_tab())
-        self.popup.add_command(label="Close (CTRL+W)", image=self.cancel_pic2, compound=tk.LEFT,
+        self.popup.add_command(label="Close", image=self.cancel_pic2, compound=tk.LEFT,
                                command=lambda: self.closeTab(clicked_tab))
         self.popup.add_command(label="Search (CTRL+F)", image=self.find_pic2, compound=tk.LEFT,
                                command=lambda: self.searchText())
@@ -258,7 +268,7 @@ class MyGUI(tk.Frame):
         if bQuestion:
             iTotalKeys = len(self.sTabsList)
             currentIID = self.sTabsList[clicked_tab]
-            self.sOpenedTabs.remove(tabName.replace("* ",""))
+            self.sOpenedTabs.remove(tabName.replace("* ", ""))
             del self.tabs[next(islice(self.tabs, clicked_tab, None))]
             for key in range(iTotalKeys):
                 if key == clicked_tab:
@@ -316,11 +326,11 @@ class MyGUI(tk.Frame):
                 sOriginalText = self.expandForScenarios(iid)
                 currentTab = ttk.Frame(self.EditorTabs)
                 self.tabs[currentTab] = Document(currentTab, self.create_text_widget(currentTab))
-                iLine=1
+                iLine = 1
                 for line in sOriginalText:
                     self.tabs[currentTab].textbox.insert('end', line)
                     self.defineFeatureFileTags(iLine, line, self.tabs[currentTab].textbox)
-                    iLine = iLine+1
+                    iLine = iLine + 1
 
                 # self.tabs[currentTab].textbox.insert('end', sOriginalText)
                 if iid.lower().endswith(".feature"):
@@ -368,7 +378,6 @@ class MyGUI(tk.Frame):
         textbox.bind("<Key>", self.UpdateFeatureFile)
         # textbox.bind("<Return>", self.UpdateFeatureFile)
 
-
         # Pack the textbox
         textbox.pack(fill='both', expand=True)
 
@@ -377,7 +386,6 @@ class MyGUI(tk.Frame):
         yscrollbar.config(command=textbox.yview)
 
         return textbox
-
 
     def create_tree_widget(self, frame):
         # Horizontal Scroll Bar
@@ -517,16 +525,15 @@ class MyGUI(tk.Frame):
 
         if len(line.split('"')) > 1:
             arSplit = line.split('"')
-
-            for x in range(len(arSplit)-2):
+            for x in range(len(arSplit) - 2):
                 if x % 2 == 0:
-                    idx = re.search('"'+arSplit[x+1]+'"', sChars)
-                    startIndex = str(sChars.index('"'+arSplit[x+1]+'"'))
-                    endIndex = str(sChars.index('"'+arSplit[x+1]+'"') + len('"'+arSplit[x+1]+'"'))
+                    idx = re.search('"' + arSplit[x + 1] + '"', sChars)
+                    startIndex = str(sChars.index('"' + arSplit[x + 1] + '"'))
+                    endIndex = str(sChars.index('"' + arSplit[x + 1] + '"') + len('"' + arSplit[x + 1] + '"'))
                     text.tag_add('doublequotes', sCursorPos.split(".")[0] + "." + startIndex,
                                  sCursorPos.split(".")[0] + "." + endIndex)
                     text.see(sCursorPos.split(".")[0] + "." + endIndex)
-                    text.tag_config('doublequotes', foreground='pink')
+                    text.tag_config('doublequotes', foreground='blue')
 
     def do_popup(self, event):
         item = self.ProjectExplorerTree.identify_row(event.y)
@@ -547,9 +554,12 @@ class MyGUI(tk.Frame):
 
             if self.ProjectExplorerTree.item(item)["text"] in self.sOpenedTabs:
                 self.popup.add_separator()
-                self.popup.add_command(label="NewScenario", command=lambda: self.newScenario())
+                self.popup.add_command(label="New Scenario", command=lambda: self.newScenario())
                 self.EditorTabs.select(self.sOpenedTabs.index(self.ProjectExplorerTree.item(item)["text"]))
 
+            if item.endswith("ScenarioXYZ"):
+                self.popup.add_command(label="Edit Scenario",
+                                       command=lambda: self.editScenario(self.ProjectExplorerTree.item(item)["text"]))
         try:
             self.popup.tk_popup(event.x_root, event.y_root, 0)
         finally:
@@ -559,14 +569,26 @@ class MyGUI(tk.Frame):
         root.destroy()
         sys.exit()
 
+    def editScenario(self, scenarioName):
+        if self.filename == "":
+            messagebox.showinfo("Information", "Please load the xml before creating the new scenario")
+        else:
+            curr_tab = self.get_tab()
+            text = self.tabs[curr_tab].textbox
+            root = tk.Tk()
+            root.geometry("800x400")
+            root.title("EditScenario")
+            root.resizable(True, True)
+            myGUI = EditScenario(root, self.filename, text, scenarioName)
+            myGUI.CreateWindow()
+            root.mainloop()
+
     def newScenario(self, *args):
         if self.filename == "":
             messagebox.showinfo("Information", "Please load the xml before creating the new scenario")
         else:
-
             curr_tab = self.get_tab()
             text = self.tabs[curr_tab].textbox
-
             root = tk.Tk()
             root.geometry("580x400")
             root.title("NewScenario")
@@ -599,7 +621,7 @@ class MyGUI(tk.Frame):
         entry.place(x=50, y=70, width=290)
         entry.insert(END, statement)
 
-        Parameters = oXml.ReadNode("//StepDefinition[@Statement='"+statement+"']/@Parameters")
+        Parameters = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@Parameters")
         mParamDict = {}
         iInitY = 120;
         if len(Parameters) > 0:
@@ -615,7 +637,7 @@ class MyGUI(tk.Frame):
                     mParamDict[arIndParams[0]] = entry2
 
         button = tk.Button(frame, text="Submit", bg='Light gray', fg='red',
-                           command=lambda: self.AddStatement(var.get() + " " + statement,mParamDict, stepDefRoot))
+                           command=lambda: self.AddStatement(var.get() + " " + statement, mParamDict, stepDefRoot))
         button.place(x=150, y=iInitY)
 
         stepDefRoot.geometry("400x" + str(iInitY + 70))
@@ -757,7 +779,7 @@ class MyGUI(tk.Frame):
         Lines = file.readlines()
         for line in Lines:
             if line.strip().lower().startswith("scenario:") or line.strip().lower().startswith("scenario outline:"):
-                self.InsertNode(self.ProjectExplorerTree, item, item + "/" + line.strip(), line.strip())
+                self.InsertNode(self.ProjectExplorerTree, item, item + "/" + line.strip() + "ScenarioXYZ", line.strip())
         file.close()
 
     def deleteFile(self, item):
@@ -886,10 +908,12 @@ class MyGUI(tk.Frame):
         for i in self.EditorTabs.tabs():
             nb = self.EditorTabs
             curr_tab = nb._nametowidget(i)
+            tabName = nb.tab(curr_tab, "text")
+            print(tabName)
             sRevisedText = self.tabs[curr_tab].textbox.get(1.0, 'end')
             with open(self.sTabsList[intIndex], 'w') as f:
                 f.write(sRevisedText)
-
+            nb.tab(curr_tab, text=tabName.replace("* ", ""))
             self.sOriginalText[intIndex] = sRevisedText
             intIndex += 1
         self.statusvar.set("All the opened tabs are saved!")
@@ -903,7 +927,7 @@ class MyGUI(tk.Frame):
             f.write(sRevisedText)
 
         self.sOriginalText[nb.index(nb.select())] = sRevisedText
-        nb.tab("current", text=tabName.replace("* ",""))
+        nb.tab("current", text=tabName.replace("* ", ""))
         self.statusvar.set(self.sTabsList[nb.index(nb.select())] + " is saved")
 
     def undo(self, *args):
@@ -923,11 +947,11 @@ class MyGUI(tk.Frame):
             curItem = self.StepDefExplorerTree.focus()
             oXml = cXml(self.filename)
             statement = self.StepDefExplorerTree.item(curItem)["text"]
-            parameters = oXml.ReadNode("//StepDefinition[@Statement='"+statement+"']/@Parameters")
+            parameters = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@Parameters")
             instructions = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@Instructions")
             xtrnlData = oXml.ReadNode("//StepDefinition[@Statement='" + statement + "']/@ExternalData")
             parent_iid = self.StepDefExplorerTree.parent(curItem)
-            app = AddStepDefinition(root, self.filename, "//StepDefinition[@Statement='"+statement+"']")
+            app = AddStepDefinition(root, self.filename, "//StepDefinition[@Statement='" + statement + "']")
             app.CreateUI()
             app.entry.insert(0, statement)
             app.instructionstext.insert('end', "".join(instructions))
@@ -939,19 +963,19 @@ class MyGUI(tk.Frame):
             sKeys = self.read_config("XML", "keys")
             arKeys = sKeys.split(",")
             app.OptionList.current(arKeys.index(self.StepDefExplorerTree.item(parent_iid)['text']))
-            sOutput = "Statement: " + statement\
-               + "\n\nCategory: " + self.StepDefExplorerTree.item(parent_iid)['text'] \
-               + "\n\nExternalData: " + "".join(xtrnlData) \
-               + "\n\nParameters: " + "".join(parameters) \
-               + "\n\nInstructions: " + "".join(instructions)
+            sOutput = "Statement: " + statement \
+                      + "\n\nCategory: " + self.StepDefExplorerTree.item(parent_iid)['text'] \
+                      + "\n\nExternalData: " + "".join(xtrnlData) \
+                      + "\n\nParameters: " + "".join(parameters) \
+                      + "\n\nInstructions: " + "".join(instructions)
             app.Outputtext.insert('end', sOutput)
             root.mainloop()
 
     def stepdefload(self):
         self.filename = filedialog.askopenfilename(initialdir="/",
-                                              filetypes=(("XML File", "*.xml"), ("All Files", "*.*")),
-                                              title="Choose a file."
-                                              )
+                                                   filetypes=(("XML File", "*.xml"), ("All Files", "*.*")),
+                                                   title="Choose a file."
+                                                   )
 
         tree = self.StepDefExplorerTree
         if self.filename != "":
